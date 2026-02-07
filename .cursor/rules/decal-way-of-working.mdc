@@ -1,0 +1,34 @@
+---
+description: Decal way of working — every change: tests, docs, validate
+alwaysApply: true
+---
+
+# Decal way of working
+
+When changing this repo, follow the cycle. Do not skip steps.
+
+## 1. Keep changes small and focused
+
+One logical change per step. Split large work into smaller steps and complete the cycle for each.
+
+## 2. Implement or update tests
+
+- **New behavior** → add tests that define and verify it.
+- **Changed behavior** → update existing tests; add new ones if needed.
+- Do not leave new or modified code untested.
+
+## 3. Add or update documentation
+
+- Update the **Docusaurus docs app** (`apps/docs/`): add or edit pages under `apps/docs/docs/` so the change is reflected (new concepts, APIs, or guides).
+- Keep docs in sync with the code.
+
+## 4. Run tests and validation before done
+
+- Run the **relevant tests** for changed code (e.g. package tests or full monorepo).
+- Run **lint and type checks** (e.g. `pnpm lint`, `pnpm check-types` from repo root).
+- Fix any failures before considering the change complete.
+
+## Reference
+
+- Full workflow: `apps/docs/docs/development/way-of-working.md`
+- Architecture plan: `decal-ecosystem-plan.md` (repo root)

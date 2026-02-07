@@ -7,7 +7,7 @@ A JSON-driven UI ecosystem: schema-defined blocks, flat content trees, and a plu
 ## 1. Vision & Goals
 
 - **JSON as source of truth**: UI structure and configuration live in data, not only in code.
-- **Schema-first**: A single schema defines what’s allowed; it drives validation, tooling, and rendering.
+- **Schema-first**: A single schema defines what's allowed; it drives validation, tooling, and rendering.
 - **Flat content model**: Content is a flat map of nodes by id + one entry id; slots reference children by id. Easy to patch, merge, and reason about.
 - **Pluggable**: Blocks and capabilities are extended via a clear plugin/schema-extension model.
 - **Multi-consumer**: Same content model can serve CMS editors, LLM-generated UIs, headless CMS APIs, and static site generation.
@@ -51,13 +51,13 @@ All under the `@decal` scope; names are placeholders to debate.
 
 | Package | Role |
 |--------|------|
-| **@decal/schema** | Define block types, config schemas, slots. Schema registry and validation. **Build-time** plugin API for “register block type / extend schema”. |
+| **@decal/schema** | Define block types, config schemas, slots. Schema registry and validation. **Build-time** plugin API for "register block type / extend schema". |
 | **@decal/content** | Types and helpers for the content model (flat nodes, entry id). Validation of a JSON definition against a schema (using @decal/schema). Optional: normalization (e.g. inline → flat), migration helpers. |
 | **@decal/patches** | Structured mutations over content: add node, remove node, reorder slot, update config. Used by revisions (drafts/published, history), undo/redo, and LLM edit-in-place. Apply patch to definition → new definition. |
 | **@decal/renderer** | **Framework-agnostic core**: takes (content JSON + schema + component map), resolves slots to children, injects config. **@decal/renderer-react** (or similar): React binding that consumes the core and renders a React tree. Other framework bindings later. |
 | **@decal/builder** | **Drag-and-drop** UI builder. Schema-aware: only offers blocks/slots allowed by schema. Outputs content JSON consumable by the renderer. Uses renderer for live preview. |
-| **@decal/llm-context** | Consumes schema (and optionally example content) and produces prompt/context so an LLM can emit valid content JSON. Supports **both** “generate full definition from scratch” and “edit existing JSON” (e.g. output a patch or updated definition). Optional: output validation + retry. |
-| **@decal/media** | Image/media manager: **upload + URL** initially. Storage abstraction so we can expand later (transforms, resize/crop, CDN ids). Schema can reference “media” type for asset ids. |
+| **@decal/llm-context** | Consumes schema (and optionally example content) and produces prompt/context so an LLM can emit valid content JSON. Supports **both** "generate full definition from scratch" and "edit existing JSON" (e.g. output a patch or updated definition). Optional: output validation + retry. |
+| **@decal/media** | Image/media manager: **upload + URL** initially. Storage abstraction so we can expand later (transforms, resize/crop, CDN ids). Schema can reference "media" type for asset ids. |
 | **@decal/revisions** | **Drafts vs published** + **linear history**. Implemented on top of **@decal/patches**: store patch sequences or snapshots, rollback, promote draft → published. Content stored as JSON (no DB requirement initially); design allows DB or file-backed storage later. |
 | **@decal/forms** | Form context for CMS: define forms (e.g. per-block edit forms), bind form state to content patches. Renderer can expose form context so blocks can show edit UIs in builder mode. |
 | **@decal/validation** | Separate package. Link integrity (no dangling ids), no cycles, required slots filled. Used by @decal/content, builder, llm-context. |
@@ -117,12 +117,12 @@ None; previous open items are decided (see §5 and §4).
 
 ---
 
-## 8. What We’re Not Deciding Yet
+## 8. What We're Not Deciding Yet
 
 - Monorepo layout (e.g. `packages/schema`, `packages/content`, … under this repo).
 - Exact npm package names (e.g. `@decal/core` vs `@decal/schema`).
 - API shapes and file structure.
-- Whether “blocks” are the only construct or we also have “layouts” / “templates” as first-class schema concepts.
+- Whether "blocks" are the only construct or we also have "layouts" / "templates" as first-class schema concepts.
 
 ---
 
@@ -195,7 +195,7 @@ Useful existing tools and libraries for building each package. Not prescriptive;
 
 | Concern | Tools / libraries |
 |--------|--------------------|
-| **Package build** | [tsup](https://github.com/egoist/tsup) (simple, ESM+CJS), [unbuild](https://github.com/unjs/unbuild), or Vite lib mode. |
+| **Package build** | [tsdown](https://tsdown.dev/) (simple, ESM+CJS, Rolldown-powered), [unbuild](https://github.com/unjs/unbuild), or Vite lib mode. |
 | **Testing** | [Vitest](https://vitest.dev/) (fast, ESM-friendly). |
 | **Linting / format** | ESLint, Prettier (already in place). |
 

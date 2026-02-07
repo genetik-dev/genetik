@@ -1,0 +1,31 @@
+---
+description: Decal ecosystem architecture — data model and package constraints
+alwaysApply: true
+---
+
+# Decal architecture constraints
+
+When adding or changing code, respect these decisions from the plan (`decal-ecosystem-plan.md` at repo root).
+
+## Data model
+
+- **Content (canonical form)**: Flat. Entry id + map of `nodeId → node`. Slots are **ids or arrays of ids** only. No nested nodes in stored/rendered content.
+- **Input (when schema allows)**: Slots may contain inline nodes; **@decal/content** normalizes them to flat + generated ids before storage or rendering.
+- **Schema**: Block types with **JSON Schema** per block for config. Slots have a **reference mode** per slot (id only, inline only, or both), defined in the schema.
+- **Versioning**: Schema and content have explicit version fields for migrations.
+
+## Packages (@decal scope)
+
+- **@decal/schema**: Block types, config (JSON Schema), slots, reference modes. **Build-time** plugin API only.
+- **@decal/content**: Flat content model, validation against schema, normalization (inline → flat), id generation.
+- **@decal/patches**: Structured mutations (add/remove/reorder/update); used by revisions and LLM edit-in-place.
+- **@decal/renderer**: **Framework-agnostic core**; React (or other) as a separate binding (e.g. @decal/renderer-react). Do not bake framework into core.
+- **@decal/validation**: Separate package; link integrity, no cycles, required slots; used by content, builder, llm-context.
+- **@decal/theme**, **@decal/i18n**: Separate plugins/packages consumed by others when needed.
+
+## Conventions
+
+- **Plugins**: Build-time loading only (no runtime plugin loading).
+- **Framework**: Keep core packages framework-agnostic; put React (or other) in wrapper packages.
+- **Package build**: Use [tsdown](https://tsdown.dev/) for building @decal packages (ESM + CJS + dts). Do not use tsup.
+- New packages under the `@decal` scope follow the roles and dependencies in the plan.
