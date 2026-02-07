@@ -1,6 +1,6 @@
 export type {
   BlockTypeDefinition,
-  DecalSchema,
+  GenetikSchema,
   JsonSchema,
   SchemaMeta,
   SlotDefinition,

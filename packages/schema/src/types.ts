@@ -47,7 +47,7 @@ export interface SchemaMeta {
 /**
  * Runtime schema: block types registered in a registry, plus optional metadata.
  */
-export interface DecalSchema {
+export interface GenetikSchema {
   /** Map of block type name to definition. */
   blockTypes: Map<string, BlockTypeDefinition>;
   /** Optional schema metadata (e.g. version). */

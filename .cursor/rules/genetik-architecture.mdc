@@ -1,0 +1,31 @@
+---
+description: Genetik ecosystem architecture — data model and package constraints
+alwaysApply: true
+---
+
+# Genetik architecture constraints
+
+When adding or changing code, respect these decisions from the plan (`genetik-ecosystem-plan.md` at repo root).
+
+## Data model
+
+- **Content (canonical form)**: Flat. Entry id + map of `nodeId → node`. Slots are **ids or arrays of ids** only. No nested nodes in stored/rendered content.
+- **Input (when schema allows)**: Slots may contain inline nodes; **@genetik/content** normalizes them to flat + generated ids before storage or rendering.
+- **Schema**: Block types with **JSON Schema** per block for config. Slots have a **reference mode** per slot (id only, inline only, or both), defined in the schema.
+- **Versioning**: Schema and content have explicit version fields for migrations.
+
+## Packages (@genetik scope)
+
+- **@genetik/schema**: Block types, config (JSON Schema), slots, reference modes. **Build-time** plugin API only.
+- **@genetik/content**: Flat content model, validation against schema, normalization (inline → flat), id generation.
+- **@genetik/patches**: Structured mutations (add/remove/reorder/update); used by revisions and LLM edit-in-place.
+- **@genetik/renderer**: **Framework-agnostic core**; React (or other) as a separate binding (e.g. @genetik/renderer-react). Do not bake framework into core.
+- **@genetik/validation**: Separate package; link integrity, no cycles, required slots; used by content, builder, llm-context.
+- **@genetik/theme**, **@genetik/i18n**: Separate plugins/packages consumed by others when needed.
+
+## Conventions
+
+- **Plugins**: Build-time loading only (no runtime plugin loading).
+- **Framework**: Keep core packages framework-agnostic; put React (or other) in wrapper packages.
+- **Package build**: Use [tsdown](https://tsdown.dev/) for building @genetik packages (ESM + CJS + dts). Do not use tsup.
+- New packages under the `@genetik` scope follow the roles and dependencies in the plan.

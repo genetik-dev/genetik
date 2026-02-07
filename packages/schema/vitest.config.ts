@@ -7,7 +7,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@decal/schema": resolve(__dirname, "./src/index.ts"),
+      "@genetik/schema": resolve(__dirname, "./src/index.ts"),
     },
   },
 });

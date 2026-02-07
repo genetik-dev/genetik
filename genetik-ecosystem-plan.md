@@ -1,4 +1,4 @@
-# @decal Ecosystem — Architecture Plan (Draft)
+# @genetik Ecosystem — Architecture Plan (Draft)
 
 A JSON-driven UI ecosystem: schema-defined blocks, flat content trees, and a plugin-based renderer for CMS, LLM-driven UIs, and dynamic applications.
 
@@ -29,7 +29,7 @@ A JSON-driven UI ecosystem: schema-defined blocks, flat content trees, and a plu
 ### 2.2 Content (JSON definition)
 
 - **Canonical form (stored / rendered)**: **Entry id** + **flat node map** (`nodeId → node`). Each node has `id`, `block`, `config`, and slot values that are **ids or arrays of ids** (e.g. `children: ["id-1", "id-2"]`). No nesting — only references by id.
-- **Input form (when schema allows inline)**: A slot may instead contain **inline node(s)** — e.g. a single node object or an array of node objects (with optional nested slots). Valid only when the schema marks that slot as allowing inline. Before storage or rendering, content is **normalized**: inline nodes are flattened, assigned ids, and slot values become id references. @decal/content owns normalization and id generation.
+- **Input form (when schema allows inline)**: A slot may instead contain **inline node(s)** — e.g. a single node object or an array of node objects (with optional nested slots). Valid only when the schema marks that slot as allowing inline. Before storage or rendering, content is **normalized**: inline nodes are flattened, assigned ids, and slot values become id references. @genetik/content owns normalization and id generation.
 - **Node shape (minimal)**:
   - `id`: key in the map (or implied by map key).
   - `block`: block type (must exist in schema).
@@ -47,33 +47,33 @@ So: **schema defines per-slot whether id-only or id + inline**; **canonical form
 
 ## 3. Proposed Package Structure
 
-All under the `@decal` scope; names are placeholders to debate.
+All under the `@genetik` scope; names are placeholders to debate.
 
 | Package | Role |
 |--------|------|
-| **@decal/schema** | Define block types, config schemas, slots. Schema registry and validation. **Build-time** plugin API for "register block type / extend schema". |
-| **@decal/content** | Types and helpers for the content model (flat nodes, entry id). Validation of a JSON definition against a schema (using @decal/schema). Optional: normalization (e.g. inline → flat), migration helpers. |
-| **@decal/patches** | Structured mutations over content: add node, remove node, reorder slot, update config. Used by revisions (drafts/published, history), undo/redo, and LLM edit-in-place. Apply patch to definition → new definition. |
-| **@decal/renderer** | **Framework-agnostic core**: takes (content JSON + schema + component map), resolves slots to children, injects config. **@decal/renderer-react** (or similar): React binding that consumes the core and renders a React tree. Other framework bindings later. |
-| **@decal/builder** | **Drag-and-drop** UI builder. Schema-aware: only offers blocks/slots allowed by schema. Outputs content JSON consumable by the renderer. Uses renderer for live preview. |
-| **@decal/llm-context** | Consumes schema (and optionally example content) and produces prompt/context so an LLM can emit valid content JSON. Supports **both** "generate full definition from scratch" and "edit existing JSON" (e.g. output a patch or updated definition). Optional: output validation + retry. |
-| **@decal/media** | Image/media manager: **upload + URL** initially. Storage abstraction so we can expand later (transforms, resize/crop, CDN ids). Schema can reference "media" type for asset ids. |
-| **@decal/revisions** | **Drafts vs published** + **linear history**. Implemented on top of **@decal/patches**: store patch sequences or snapshots, rollback, promote draft → published. Content stored as JSON (no DB requirement initially); design allows DB or file-backed storage later. |
-| **@decal/forms** | Form context for CMS: define forms (e.g. per-block edit forms), bind form state to content patches. Renderer can expose form context so blocks can show edit UIs in builder mode. |
-| **@decal/validation** | Separate package. Link integrity (no dangling ids), no cycles, required slots filled. Used by @decal/content, builder, llm-context. |
-| **@decal/theme** | Theming plugin/package; consumed by renderer, builder, and other packages when needed. |
-| **@decal/i18n** | Internationalization plugin/package; consumed by other packages when needed. |
+| **@genetik/schema** | Define block types, config schemas, slots. Schema registry and validation. **Build-time** plugin API for "register block type / extend schema". |
+| **@genetik/content** | Types and helpers for the content model (flat nodes, entry id). Validation of a JSON definition against a schema (using @genetik/schema). Optional: normalization (e.g. inline → flat), migration helpers. |
+| **@genetik/patches** | Structured mutations over content: add node, remove node, reorder slot, update config. Used by revisions (drafts/published, history), undo/redo, and LLM edit-in-place. Apply patch to definition → new definition. |
+| **@genetik/renderer** | **Framework-agnostic core**: takes (content JSON + schema + component map), resolves slots to children, injects config. **@genetik/renderer-react** (or similar): React binding that consumes the core and renders a React tree. Other framework bindings later. |
+| **@genetik/builder** | **Drag-and-drop** UI builder. Schema-aware: only offers blocks/slots allowed by schema. Outputs content JSON consumable by the renderer. Uses renderer for live preview. |
+| **@genetik/llm-context** | Consumes schema (and optionally example content) and produces prompt/context so an LLM can emit valid content JSON. Supports **both** "generate full definition from scratch" and "edit existing JSON" (e.g. output a patch or updated definition). Optional: output validation + retry. |
+| **@genetik/media** | Image/media manager: **upload + URL** initially. Storage abstraction so we can expand later (transforms, resize/crop, CDN ids). Schema can reference "media" type for asset ids. |
+| **@genetik/revisions** | **Drafts vs published** + **linear history**. Implemented on top of **@genetik/patches**: store patch sequences or snapshots, rollback, promote draft → published. Content stored as JSON (no DB requirement initially); design allows DB or file-backed storage later. |
+| **@genetik/forms** | Form context for CMS: define forms (e.g. per-block edit forms), bind form state to content patches. Renderer can expose form context so blocks can show edit UIs in builder mode. |
+| **@genetik/validation** | Separate package. Link integrity (no dangling ids), no cycles, required slots filled. Used by @genetik/content, builder, llm-context. |
+| **@genetik/theme** | Theming plugin/package; consumed by renderer, builder, and other packages when needed. |
+| **@genetik/i18n** | Internationalization plugin/package; consumed by other packages when needed. |
 
 ---
 
 ## 4. Additional Concepts & Packages
 
-- **@decal/registry**: Build if required. Central place for all known block types and their metadata (label, icon, category, default config). Builder and LLM-context could depend on this; implemented on top of @decal/schema.
+- **@genetik/registry**: Build if required. Central place for all known block types and their metadata (label, icon, category, default config). Builder and LLM-context could depend on this; implemented on top of @genetik/schema.
 - **Templates / presets**: Ensure we can support in the future. Reusable content fragments (e.g. two-column layout, pricing section); data model and schema should allow for this.
-- **@decal/validation**: Yes, separate package. Beyond valid-against-schema: link integrity (no dangling ids), no cycles, required slots filled. Clear error reporting for builder and LLM. Used by other packages.
-- **@decal/server**: Ensure we can support in the future. Optional backend helpers: save/load content, run validation, media URLs, revisions. Design so a server layer can be added later.
-- **@decal/theme**: Separate plugin/package for theming; consumed by renderer, builder, and other packages when needed (see §5 Theming).
-- **@decal/i18n**: Separate plugin/package for internationalization; consumed by other packages when needed (see §5 i18n).
+- **@genetik/validation**: Yes, separate package. Beyond valid-against-schema: link integrity (no dangling ids), no cycles, required slots filled. Clear error reporting for builder and LLM. Used by other packages.
+- **@genetik/server**: Ensure we can support in the future. Optional backend helpers: save/load content, run validation, media URLs, revisions. Design so a server layer can be added later.
+- **@genetik/theme**: Separate plugin/package for theming; consumed by renderer, builder, and other packages when needed (see §5 Theming).
+- **@genetik/i18n**: Separate plugin/package for internationalization; consumed by other packages when needed (see §5 i18n).
 
 ---
 
@@ -81,7 +81,7 @@ All under the `@decal` scope; names are placeholders to debate.
 
 | Topic | Decision |
 |-------|----------|
-| **Framework** | Framework-agnostic core everywhere. First UI implementation: React wrapper(s) where needed (e.g. @decal/renderer-react, builder built with React). |
+| **Framework** | Framework-agnostic core everywhere. First UI implementation: React wrapper(s) where needed (e.g. @genetik/renderer-react, builder built with React). |
 | **Builder** | Build a **drag-and-drop** editor (not form-based first). |
 | **Storage** | Content as JSON for now; no DB requirement. Design so a file-backed or database-backed layer can be added later. |
 | **Plugins** | **Build-time loading**: plugins are loaded at build time (not runtime). Schema/plugin API registers block types and extensions when the app is built. |
@@ -89,10 +89,10 @@ All under the `@decal` scope; names are placeholders to debate.
 | **Revisions** | **Drafts and published** + **linear history**. Use a **patches** concept to implement: history as patch sequence (or snapshots), rollback, promote draft → published. |
 | **LLM** | Support **both**: generate full JSON from scratch and edit existing JSON (e.g. LLM outputs a patch or updated definition). |
 | **Schema format** | **JSON Schema** per block type for block config. Standard, tooling-rich, validatable. |
-| **References** | Support **both** id and inline. The **schema defines per-slot** whether a slot accepts **id only**, **inline only**, or **both**. Inline nodes are normalized to flat + generated ids before storage and rendering; @decal/content owns normalization. |
+| **References** | Support **both** id and inline. The **schema defines per-slot** whether a slot accepts **id only**, **inline only**, or **both**. Inline nodes are normalized to flat + generated ids before storage and rendering; @genetik/content owns normalization. |
 | **Schema/content versioning** | **Yes.** Explicit schema version and/or content version fields for migrations and compatibility. |
-| **Theming** | **Separate plugin/package** (@decal/theme or similar). Used by other packages when needed. Not part of core block config. |
-| **i18n** | **Its own plugin/package** (@decal/i18n or similar). Used by other packages when needed. |
+| **Theming** | **Separate plugin/package** (@genetik/theme or similar). Used by other packages when needed. Not part of core block config. |
+| **i18n** | **Its own plugin/package** (@genetik/i18n or similar). Used by other packages when needed. |
 
 ---
 
@@ -104,23 +104,23 @@ None; previous open items are decided (see §5 and §4).
 
 ## 7. Dependencies Between Packages (Rough)
 
-- **@decal/schema**: no decal deps (foundation).
-- **@decal/content**: depends on @decal/schema (validation).
-- **@decal/patches**: depends on @decal/content (types; apply patch → new definition).
-- **@decal/renderer** (core): depends on @decal/schema, @decal/content. **@decal/renderer-react**: depends on renderer core + React.
-- **@decal/builder**: depends on @decal/schema, @decal/content, renderer (for preview).
-- **@decal/llm-context**: depends on @decal/schema (and optionally @decal/content for examples); should work with patch format for edit-in-place.
-- **@decal/revisions**: depends on @decal/content, **@decal/patches** (history as patches/snapshots, rollback).
-- **@decal/media**, **@decal/forms**: minimal decal deps; integrate via CMS or app layer.
-- **@decal/validation**: depends on @decal/schema, @decal/content; used by content, builder, llm-context.
-- **@decal/theme**, **@decal/i18n**: minimal decal deps; consumed by renderer, builder, and other packages when needed.
+- **@genetik/schema**: no genetik deps (foundation).
+- **@genetik/content**: depends on @genetik/schema (validation).
+- **@genetik/patches**: depends on @genetik/content (types; apply patch → new definition).
+- **@genetik/renderer** (core): depends on @genetik/schema, @genetik/content. **@genetik/renderer-react**: depends on renderer core + React.
+- **@genetik/builder**: depends on @genetik/schema, @genetik/content, renderer (for preview).
+- **@genetik/llm-context**: depends on @genetik/schema (and optionally @genetik/content for examples); should work with patch format for edit-in-place.
+- **@genetik/revisions**: depends on @genetik/content, **@genetik/patches** (history as patches/snapshots, rollback).
+- **@genetik/media**, **@genetik/forms**: minimal genetik deps; integrate via CMS or app layer.
+- **@genetik/validation**: depends on @genetik/schema, @genetik/content; used by content, builder, llm-context.
+- **@genetik/theme**, **@genetik/i18n**: minimal genetik deps; consumed by renderer, builder, and other packages when needed.
 
 ---
 
 ## 8. What We're Not Deciding Yet
 
 - Monorepo layout (e.g. `packages/schema`, `packages/content`, … under this repo).
-- Exact npm package names (e.g. `@decal/core` vs `@decal/schema`).
+- Exact npm package names (e.g. `@genetik/core` vs `@genetik/schema`).
 - API shapes and file structure.
 - Whether "blocks" are the only construct or we also have "layouts" / "templates" as first-class schema concepts.
 
@@ -134,7 +134,7 @@ Useful existing tools and libraries for building each package. Not prescriptive;
 
 | Concern | Tools / libraries |
 |--------|--------------------|
-| **JSON Schema validation** | [ajv](https://github.com/ajv-validator/ajv) (fast, widely used), [ajv-formats](https://github.com/ajv-validator/ajv-formats) for string formats. Use in @decal/schema and @decal/content. |
+| **JSON Schema validation** | [ajv](https://github.com/ajv-validator/ajv) (fast, widely used), [ajv-formats](https://github.com/ajv-validator/ajv-formats) for string formats. Use in @genetik/schema and @genetik/content. |
 | **Types from schema** | [json-schema-to-typescript](https://github.com/bcherny/json-schema-to-typescript) or [quicktype](https://quicktype.io/) to generate TypeScript types from JSON Schema. |
 | **ID generation** | [nanoid](https://github.com/ai/nanoid) or [uuid](https://github.com/uuidjs/uuid) for node ids during normalization. |
 
@@ -142,7 +142,7 @@ Useful existing tools and libraries for building each package. Not prescriptive;
 
 | Concern | Tools / libraries |
 |--------|--------------------|
-| **JSON Patch (RFC 6902)** | [fast-json-patch](https://github.com/Starcounter-Jack/JSON-Patch) to produce/apply patches. Optional standard for @decal/patches. |
+| **JSON Patch (RFC 6902)** | [fast-json-patch](https://github.com/Starcounter-Jack/JSON-Patch) to produce/apply patches. Optional standard for @genetik/patches. |
 | **Immutable updates** | [immer](https://github.com/immerjs/immer) if you want a mutable-style API that produces new content. |
 | **Diff / history** | [deep-diff](https://github.com/flitbit/diff), or store full snapshots and use fast-json-patch for diff. |
 

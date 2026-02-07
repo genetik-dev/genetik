@@ -1,5 +1,5 @@
 {
-  "name": "decal",
+  "name": "genetik",
   "private": true,
   "scripts": {
     "build": "turbo run build",

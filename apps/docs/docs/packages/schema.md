@@ -2,9 +2,9 @@
 sidebar_position: 1
 ---
 
-# @decal/schema
+# @genetik/schema
 
-The schema package is the foundation of the Decal ecosystem. It defines block types, their config (JSON Schema), and slots with reference modes. Other packages (@decal/content, @decal/renderer, @decal/builder, etc.) depend on it.
+The schema package is the foundation of the Genetik ecosystem. It defines block types, their config (JSON Schema), and slots with reference modes. Other packages (@genetik/content, @genetik/renderer, @genetik/builder, etc.) depend on it.
 
 ## Concepts
 
@@ -18,7 +18,7 @@ The schema package is the foundation of the Decal ecosystem. It defines block ty
 ## Installation
 
 ```bash
-pnpm add @decal/schema
+pnpm add @genetik/schema
 ```
 
 ## Usage
@@ -31,7 +31,7 @@ import {
   registerBlockType,
   getBlockType,
   validateConfig,
-} from "@decal/schema";
+} from "@genetik/schema";
 
 const schema = createSchema({ version: "1.0.0" });
 
@@ -87,8 +87,8 @@ if (result.valid) {
 | `validateConfig(schema, blockTypeName, config)` | Validate config against the block type's JSON Schema. |
 | `validateConfigAgainstDefinition(blockType, config)` | Validate config when you already have the block type definition. |
 
-Types: `BlockTypeDefinition`, `SlotDefinition`, `SlotReferenceMode`, `DecalSchema`, `SchemaMeta`, `JsonSchema`, `ValidationResult`.
+Types: `BlockTypeDefinition`, `SlotDefinition`, `SlotReferenceMode`, `GenetikSchema`, `SchemaMeta`, `JsonSchema`, `ValidationResult`.
 
 ## Package location and build
 
-Source: `packages/schema` in the monorepo. The package is built with [tsdown](https://tsdown.dev/) (ESM + CJS + types). Run `pnpm build` from the package directory or `pnpm --filter @decal/schema build` from the repo root.
+Source: `packages/schema` in the monorepo. The package is built with [tsdown](https://tsdown.dev/) (ESM + CJS + types). Run `pnpm build` from the package directory or `pnpm --filter @genetik/schema build` from the repo root.

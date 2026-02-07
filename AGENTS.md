@@ -1,4 +1,4 @@
-# Agent guidance for Decal
+# Agent guidance for Genetik
 
 When updating this repository, follow the **way of working** and **architecture** defined for the project.
 
@@ -11,12 +11,12 @@ When updating this repository, follow the **way of working** and **architecture*
 
 ## Architecture
 
-- **Content model**: Flat — entry id + node map; slots are id references. Inline nodes (when schema allows) are normalized to flat by @decal/content.
+- **Content model**: Flat — entry id + node map; slots are id references. Inline nodes (when schema allows) are normalized to flat by @genetik/content.
 - **Schema**: JSON Schema per block; per-slot reference mode (id / inline / both). Build-time plugins only.
-- **Packages**: Under `@decal` scope; renderer is framework-agnostic with React (or other) in separate bindings. See package roles and deps in the plan.
+- **Packages**: Under `@genetik` scope; renderer is framework-agnostic with React (or other) in separate bindings. See package roles and deps in the plan.
 
 ## References
 
-- **Full plan**: [decal-ecosystem-plan.md](decal-ecosystem-plan.md)
+- **Full plan**: [genetik-ecosystem-plan.md](genetik-ecosystem-plan.md)
 - **Way of working (docs)**: [apps/docs/docs/development/way-of-working.md](apps/docs/docs/development/way-of-working.md)
 - **Cursor rules**: [.cursor/rules/](.cursor/rules/) — detailed rules for way of working, architecture, and docs app.

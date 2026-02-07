@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # Way of working
 
-We build the Decal ecosystem in **small, incremental changes**. Each change follows the same cycle so the codebase stays stable, documented, and verifiable.
+We build the Genetik ecosystem in **small, incremental changes**. Each change follows the same cycle so the codebase stays stable, documented, and verifiable.
 
 ## The cycle
 

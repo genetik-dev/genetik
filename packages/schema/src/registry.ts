@@ -1,9 +1,9 @@
-import type { BlockTypeDefinition, DecalSchema, SchemaMeta } from "./types.js";
+import type { BlockTypeDefinition, GenetikSchema, SchemaMeta } from "./types.js";
 
 /**
  * Creates an empty schema. Use the returned object to register block types.
  */
-export function createSchema(meta?: SchemaMeta): DecalSchema {
+export function createSchema(meta?: SchemaMeta): GenetikSchema {
   return {
     blockTypes: new Map(),
     meta,
@@ -14,7 +14,7 @@ export function createSchema(meta?: SchemaMeta): DecalSchema {
  * Registers a block type on the schema. Overwrites if the name already exists.
  */
 export function registerBlockType(
-  schema: DecalSchema,
+  schema: GenetikSchema,
   blockType: BlockTypeDefinition
 ): void {
   schema.blockTypes.set(blockType.name, blockType);
@@ -24,7 +24,7 @@ export function registerBlockType(
  * Returns the block type definition for the given name, or undefined if not registered.
  */
 export function getBlockType(
-  schema: DecalSchema,
+  schema: GenetikSchema,
   name: string
 ): BlockTypeDefinition | undefined {
   return schema.blockTypes.get(name);
@@ -33,13 +33,13 @@ export function getBlockType(
 /**
  * Returns true if the schema has a block type with the given name.
  */
-export function hasBlockType(schema: DecalSchema, name: string): boolean {
+export function hasBlockType(schema: GenetikSchema, name: string): boolean {
   return schema.blockTypes.has(name);
 }
 
 /**
  * Returns all registered block type names.
  */
-export function getBlockTypeNames(schema: DecalSchema): string[] {
+export function getBlockTypeNames(schema: GenetikSchema): string[] {
   return Array.from(schema.blockTypes.keys());
 }

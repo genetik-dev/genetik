@@ -1,9 +1,9 @@
 ---
-description: Decal way of working — every change: tests, docs, validate
+description: Genetik way of working — every change: tests, docs, validate
 alwaysApply: true
 ---
 
-# Decal way of working
+# Genetik way of working
 
 When changing this repo, follow the cycle. Do not skip steps.
 
@@ -31,4 +31,4 @@ One logical change per step. Split large work into smaller steps and complete th
 ## Reference
 
 - Full workflow: `apps/docs/docs/development/way-of-working.md`
-- Architecture plan: `decal-ecosystem-plan.md` (repo root)
+- Architecture plan: `genetik-ecosystem-plan.md` (repo root)

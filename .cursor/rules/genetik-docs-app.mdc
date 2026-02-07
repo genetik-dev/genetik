@@ -4,7 +4,7 @@ globs: apps/docs/**/*
 alwaysApply: false
 ---
 
-# Decal docs app (Docusaurus)
+# Genetik docs app (Docusaurus)
 
 The docs site lives in `apps/docs/`. When adding or updating documentation:
 
@@ -18,7 +18,7 @@ The docs site lives in `apps/docs/`. When adding or updating documentation:
 
 - Use **straight ASCII quotes** (`"`) in markdown to avoid match issues with tooling.
 - Link to other docs with relative paths or paths under `/docs/` (e.g. `/docs/development/way-of-working`).
-- When documenting a new @decal package or API, add a page under an appropriate category (e.g. `docs/packages/` or `docs/guides/`) and link from the architecture or intro as needed.
+- When documenting a new @genetik package or API, add a page under an appropriate category (e.g. `docs/packages/` or `docs/guides/`) and link from the architecture or intro as needed.
 
 ## Commands
 

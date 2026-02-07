@@ -1,11 +1,11 @@
-# @decal/schema
+# @genetik/schema
 
-Block types, config (JSON Schema), slots, and reference modes for the Decal JSON-driven UI ecosystem.
+Block types, config (JSON Schema), slots, and reference modes for the Genetik JSON-driven UI ecosystem.
 
 ## Install
 
 ```bash
-pnpm add @decal/schema
+pnpm add @genetik/schema
 ```
 
 ## Usage
@@ -16,7 +16,7 @@ import {
   registerBlockType,
   getBlockType,
   validateConfig,
-} from "@decal/schema";
+} from "@genetik/schema";
 
 const schema = createSchema({ version: "1.0.0" });
 registerBlockType(schema, {

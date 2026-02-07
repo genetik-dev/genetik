@@ -1,6 +1,6 @@
 import Ajv, { type ErrorObject } from "ajv";
 import addFormats from "ajv-formats";
-import type { BlockTypeDefinition, DecalSchema, JsonSchema } from "./types.js";
+import type { BlockTypeDefinition, GenetikSchema, JsonSchema } from "./types.js";
 import { getBlockType } from "./registry.js";
 
 const ajv = new Ajv({ allErrors: true, strict: false });
@@ -16,7 +16,7 @@ export interface ValidationResult {
  * Returns { valid: true, errors: null } on success, or { valid: false, errors } on failure.
  */
 export function validateConfig(
-  schema: DecalSchema,
+  schema: GenetikSchema,
   blockTypeName: string,
   config: unknown
 ): ValidationResult {
