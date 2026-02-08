@@ -1,5 +1,8 @@
 # Version only: run changeset version, commit and push. No build or publish.
 # The resulting push triggers the release workflow.
+#
+# If your org locks workflow permissions to read-only, add a repo secret
+# REPO_ACCESS_TOKEN (a PAT with "contents: write") so this workflow can push.
 name: Version
 
 on:
@@ -16,7 +19,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          # Use PAT when org locks GITHUB_TOKEN to read-only; else GITHUB_TOKEN can push
+          token: ${{ secrets.REPO_ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Enable pnpm
         uses: pnpm/action-setup@v4
