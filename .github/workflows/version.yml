@@ -1,8 +1,11 @@
 # Version only: run changeset version, commit and push. No build or publish.
 # The resulting push triggers the release workflow.
 #
-# If your org locks workflow permissions to read-only, add a repo secret
-# REPO_ACCESS_TOKEN (a PAT with "contents: write") so this workflow can push.
+# - If your org locks workflow permissions to read-only, add repo secret
+#   REPO_ACCESS_TOKEN (a PAT with "contents: write") so this workflow can push.
+# - If main is protected with "Require a pull request", add the PAT owner to
+#   "Allow specified actors to bypass required pull requests" so the version
+#   commit can be pushed, or switch to a version-PR flow (create PR instead of push).
 name: Version
 
 on:

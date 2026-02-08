@@ -34,12 +34,21 @@ jobs:
       - name: Build
         run: pnpm build
 
+      - name: Check for NPM token
+        id: check_npm
+        run: |
+          if [ -n "${{ secrets.NPM_TOKEN }}" ]; then
+            echo "token_set=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "token_set=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Configure npm for publish
+        if: steps.check_npm.outputs.token_set == 'true'
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" >> .npmrc
-        if: secrets.NPM_TOKEN != ''
 
       - name: Publish to npm
-        if: secrets.NPM_TOKEN != ''
+        if: steps.check_npm.outputs.token_set == 'true'
         run: pnpm --filter "./packages/*" publish -r --no-git-checks --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
