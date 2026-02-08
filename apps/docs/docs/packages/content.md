@@ -4,7 +4,7 @@ sidebar_position: 2
 
 # @genetik/content
 
-The content package provides the **flat content model**, **validation** of content JSON against a schema, and **normalization** (inline → flat + id generation). It depends on @genetik/schema for block types and config validation.
+The content package provides the **flat content model**, **parsing** of content JSON strings, **validation** of content against a schema, and **normalization** (inline → flat + id generation). It depends on @genetik/schema for block types and config validation.
 
 ## Concepts
 
@@ -41,21 +41,41 @@ const slotValue: SlotValue = "child-id";
 const slotValues: SlotValue = ["id-1", "id-2"];
 ```
 
+## Parsing
+
+When you have a raw JSON string (e.g. from user input or an API), use `parseContentJson` to parse it and check the minimal shape (`entryId` and `nodes`). It does not validate against a schema or normalize; use `validateContent` and `normalizeContent` for that.
+
+```ts
+import { parseContentJson } from "@genetik/content";
+
+const result = parseContentJson(rawString);
+
+if (result.ok) {
+  const content = result.content; // GenetikContent
+  // pass to validateContent, normalizeContent, or renderContent
+} else {
+  console.error(result.error); // e.g. "Invalid JSON" or "Content must have entryId (string)"
+}
+```
+
 ## Validation
 
 ```ts
 import { validateContent } from "@genetik/content";
-import { createSchema, registerBlockType } from "@genetik/schema";
+import { createSchema } from "@genetik/schema";
 
-const schema = createSchema();
-registerBlockType(schema, {
-  name: "text",
-  configSchema: {
-    type: "object",
-    properties: { content: { type: "string" } },
-    required: ["content"],
-  },
-  slots: [],
+const schema = createSchema({
+  registerBlocks: [
+    {
+      name: "text",
+      configSchema: {
+        type: "object",
+        properties: { content: { type: "string" } },
+        required: ["content"],
+      },
+      slots: [],
+    },
+  ],
 });
 
 const result = validateContent(schema, {
@@ -87,18 +107,22 @@ When a slot has `referenceMode` "inline" or "both", you can pass content with in
 
 ```ts
 import { normalizeContent, validateContent } from "@genetik/content";
-import { createSchema, registerBlockType } from "@genetik/schema";
+import { createSchema } from "@genetik/schema";
 
-const schema = createSchema();
-registerBlockType(schema, {
-  name: "text",
-  configSchema: { type: "object", properties: { content: { type: "string" } }, required: ["content"] },
-  slots: [],
-});
-registerBlockType(schema, {
-  name: "card",
-  configSchema: { type: "object", properties: { title: { type: "string" } } },
-  slots: [{ name: "children", multiple: true, referenceMode: "both" }],
+const schema = createSchema({
+  registerBlocks: [
+    {
+      name: "text",
+      configSchema: { type: "object", properties: { content: { type: "string" } }, required: ["content"] },
+      slots: [],
+    },
+    {
+      name: "card",
+      configSchema: { type: "object", properties: { title: { type: "string" } } },
+      slots: [{ name: "children", multiple: true }],
+    },
+  ],
+  options: { slotReferenceMode: "both" },
 });
 
 const input = {
@@ -133,6 +157,7 @@ const canonical = normalizeContent(schema, input, {
 
 | Export | Description |
 |--------|-------------|
+| `parseContentJson(raw)` | Parses a JSON string into content. Returns `{ ok: true, content }` or `{ ok: false, error }`. Does not validate or normalize. |
 | `normalizeContent(schema, input, options?)` | Flattens inline nodes to canonical form; assigns ids (nanoid or custom). |
 | `validateContent(schema, content)` | Validates content against a schema. Returns `{ valid, errors }`. |
 | `GenetikContent` | Type: `{ entryId: string; nodes: Record<string, ContentNode> }`. |
@@ -142,6 +167,7 @@ const canonical = normalizeContent(schema, input, {
 | `SlotValue` | Type: `string \| string[]`. |
 | `InlineNode`, `InlineSlotValue` | Types for inline slot values. |
 | `NormalizeOptions` | Type: `{ generateId?: () => string }`. |
+| `ParseContentResult` | Type: `{ ok: true; content: GenetikContent } \| { ok: false; error: string }`. |
 | `ContentValidationError` | Type: `{ path: string; message: string }`. |
 | `ContentValidationResult` | Type: `{ valid: boolean; errors: ContentValidationError[] }`. |
 

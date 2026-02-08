@@ -4,16 +4,15 @@ sidebar_position: 1
 
 # @genetik/schema
 
-The schema package is the foundation of the Genetik ecosystem. It defines block types, their config (JSON Schema), and slots with reference modes. Other packages (@genetik/content, @genetik/renderer, @genetik/builder, etc.) depend on it.
+The schema package is the foundation of the Genetik ecosystem. It uses its own config API (not raw JSON Schema) and returns a schema with getters plus a **contentSchema** (JSON Schema for the content document). Other packages (@genetik/content, @genetik/renderer, @genetik/builder, etc.) depend on it.
 
 ## Concepts
 
-- **Block type**: A named definition (e.g. `text`, `card`, `hero`) with a **config schema** (JSON Schema) and **slots**.
-- **Slot**: A named place for child nodes. Each slot has:
-  - **name** (e.g. `children`, `header`)
-  - **multiple**: whether it holds one node or an ordered list
-  - **referenceMode**: `"id"` (ids only), `"inline"` (inline nodes only), or `"both"`
-- **Schema**: A registry of block types, plus optional metadata (e.g. version for migrations).
+- **Config API**: `createSchema({ registerBlocks, registerPlugins, version, options })` — distinct from JSON Schema; plugins can register blocks and add options.
+- **Block input**: When registering a block you supply **name**, **configSchema** (JSON Schema for that block's config), and **slots** with **name** and **multiple** only. No per-slot reference mode.
+- **Global reference mode**: **slotReferenceMode** is a schema-level option (`"id"` | `"inline"` | `"both"`). It applies to all slots. Default is `"id"`.
+- **Plugins**: Build-time only. A plugin receives a context and can `registerBlock(block)` and read/mutate `options`.
+- **Return value**: The schema instance has `blockTypes`, `meta`, **contentSchema** (JSON Schema for content), **options**, **version**, and getters: `getBlockType(name)`, `getBlockTypeNames()`, `hasBlockType(name)`.
 
 ## Installation
 
@@ -23,46 +22,69 @@ pnpm add @genetik/schema
 
 ## Usage
 
-### Create a schema and register block types
+### Create a schema from config
 
 ```ts
 import {
   createSchema,
-  registerBlockType,
   getBlockType,
   validateConfig,
 } from "@genetik/schema";
 
-const schema = createSchema({ version: "1.0.0" });
-
-registerBlockType(schema, {
-  name: "text",
-  configSchema: {
-    type: "object",
-    properties: { content: { type: "string" } },
-    required: ["content"],
-  },
-  slots: [],
-});
-
-registerBlockType(schema, {
-  name: "card",
-  configSchema: {
-    type: "object",
-    properties: { title: { type: "string" } },
-  },
-  slots: [
-    { name: "children", multiple: true, referenceMode: "both" },
+const schema = createSchema({
+  version: "1.0.0",
+  registerBlocks: [
+    {
+      name: "text",
+      configSchema: {
+        type: "object",
+        properties: { content: { type: "string" } },
+        required: ["content"],
+      },
+      slots: [],
+    },
+    {
+      name: "card",
+      configSchema: {
+        type: "object",
+        properties: { title: { type: "string" } },
+      },
+      slots: [{ name: "children", multiple: true }],
+    },
   ],
+  options: { slotReferenceMode: "both" }, // optional; default "id"
 });
 ```
 
-### Look up a block type
+### Plugins
+
+Plugins run in order and can register blocks and add options.
 
 ```ts
-const textBlock = getBlockType(schema, "text");
-// use textBlock.configSchema, textBlock.slots, etc.
+const schema = createSchema({
+  registerBlocks: [textBlock],
+  registerPlugins: [
+    (ctx) => {
+      ctx.registerBlock({ name: "card", configSchema: {}, slots: [{ name: "children", multiple: true }] });
+      ctx.options.myOption = "value";
+    },
+  ],
+  version: "1.0.0",
+});
 ```
+
+### Getters and contentSchema
+
+```ts
+schema.getBlockType("text");   // block type definition (slots have referenceMode from options)
+schema.getBlockTypeNames();    // ["text", "card"]
+schema.hasBlockType("text");   // true
+schema.contentSchema;          // JSON Schema for the content document (entryId + nodes)
+schema.options;                // { slotReferenceMode: "both", ... }
+schema.version;                // "1.0.0"
+```
+
+Standalone functions still work: `getBlockType(schema, "text")`, etc.
 
 ### Validate block config
 
@@ -79,15 +101,14 @@ if (result.valid) {
 
 | Export | Description |
 |--------|-------------|
-| `createSchema(meta?)` | Create an empty schema. |
-| `registerBlockType(schema, blockType)` | Register a block type. |
+| `createSchema(config)` | Create a schema. Config: `registerBlocks`, `registerPlugins`, `version`, `options`. Returns schema instance with getters and `contentSchema`. |
 | `getBlockType(schema, name)` | Get a block type by name. |
 | `hasBlockType(schema, name)` | Check if a block type exists. |
 | `getBlockTypeNames(schema)` | List all registered block type names. |
 | `validateConfig(schema, blockTypeName, config)` | Validate config against the block type's JSON Schema. |
 | `validateConfigAgainstDefinition(blockType, config)` | Validate config when you already have the block type definition. |
 
-Types: `BlockTypeDefinition`, `SlotDefinition`, `SlotReferenceMode`, `GenetikSchema`, `SchemaMeta`, `JsonSchema`, `ValidationResult`.
+Types: `BlockInput`, `BlockTypeDefinition`, `SlotInput`, `SlotDefinition`, `SlotReferenceMode`, `SchemaConfig`, `SchemaOptions`, `SchemaPlugin`, `SchemaPluginContext`, `SchemaInstance`, `GenetikSchema`, `SchemaMeta`, `JsonSchema`, `ValidationResult`.
 
 ## Package location and build
 

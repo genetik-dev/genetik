@@ -1,25 +1,42 @@
 # Website
 
-This website is built using [Docusaurus](https://docusaurus.io/), a modern static website generator.
+This website is built using [Docusaurus](https://docusaurus.io/), a modern static website generator. It depends on the `@genetik/*` workspace packages.
 
 ## Installation
 
+From the **repository root** (so workspace packages are linked and built):
+
 ```bash
-yarn
+pnpm install
+pnpm build
+```
+
+Then from this directory (or from root with a filter):
+
+```bash
+pnpm --filter docs start
 ```
 
 ## Local Development
 
 ```bash
-yarn start
+pnpm --filter docs dev
 ```
 
-This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
+Or from `apps/docs`: `pnpm dev`. This starts a local dev server (port 3001). Most changes are reflected live. In development, the docs app resolves `@genetik/*` to package **source** (via `plugins/genetik-source.cjs`) so edits in `packages/*` trigger HMR without rebuilding dist. Production builds use the built packages from dist.
 
 ## Build
 
+From the repo root (builds all packages then docs):
+
 ```bash
-yarn build
+pnpm build
+```
+
+Or only the docs app (Turbo will still build dependency packages first):
+
+```bash
+pnpm --filter docs build
 ```
 
 This command generates static content into the `build` directory and can be served using any static contents hosting service.

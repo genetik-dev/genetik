@@ -114,7 +114,7 @@ function validateNode(
 
   const configResult = validateConfigAgainstDefinition(blockType, config ?? {});
   if (!configResult.valid && configResult.errors?.length) {
-    const first = configResult.errors[0];
+    const first = configResult.errors[0]!;
     return {
       path: `${path}.${mapKey}.config`,
       message: first.message ?? "Invalid config",

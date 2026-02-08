@@ -12,6 +12,10 @@ export {
   type NormalizeOptions,
 } from "./normalize.js";
 export {
+  parseContentJson,
+  type ParseContentResult,
+} from "./parse.js";
+export {
   validateContent,
   type ContentValidationError,
   type ContentValidationResult,

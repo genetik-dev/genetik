@@ -20,16 +20,17 @@ A JSON-driven UI ecosystem: schema-defined blocks, flat content trees, and a plu
 
 - **Block types**: Named block definitions (e.g. `hero`, `card`, `text`, `grid`, `form-field`).
 - **Per-block config schema**: What configuration each block accepts (e.g. title, image url, layout variant). **JSON Schema** per block type — standard, tooling-rich, validatable.
-- **Slots**: For each block type, which slots exist (e.g. `children`, `header`, `footer`), whether each accepts a single node or an ordered list, and **reference mode**:
+- **Slots**: For each block type, which slots exist (e.g. `children`, `header`, `footer`) and whether each accepts a single node or an ordered list. **Reference mode** is a **global schema option** (not per-slot):
   - **id**: slot value is an id or array of ids (references into the node map). Canonical form.
   - **inline**: slot may also contain inline node(s) — nested structure that gets **normalized** to flat + generated ids before storage/rendering.
-  - The schema defines per-slot whether that slot allows **id only**, **inline only**, or **both** (id or inline).
+  - **both**: slot accepts either id(s) or inline node(s).
+  - The schema has one setting (e.g. `slotReferenceMode`) that applies to all slots: **id only**, **inline only**, or **both**.
 - **Plugins**: Extensions that register new block types (and possibly new config shapes or validation rules).
 
 ### 2.2 Content (JSON definition)
 
 - **Canonical form (stored / rendered)**: **Entry id** + **flat node map** (`nodeId → node`). Each node has `id`, `block`, `config`, and slot values that are **ids or arrays of ids** (e.g. `children: ["id-1", "id-2"]`). No nesting — only references by id.
-- **Input form (when schema allows inline)**: A slot may instead contain **inline node(s)** — e.g. a single node object or an array of node objects (with optional nested slots). Valid only when the schema marks that slot as allowing inline. Before storage or rendering, content is **normalized**: inline nodes are flattened, assigned ids, and slot values become id references. @genetik/content owns normalization and id generation.
+- **Input form (when schema allows inline)**: A slot may instead contain **inline node(s)** — e.g. a single node object or an array of node objects (with optional nested slots). Valid only when the schema's global reference mode allows inline. Before storage or rendering, content is **normalized**: inline nodes are flattened, assigned ids, and slot values become id references. @genetik/content owns normalization and id generation.
 - **Node shape (minimal)**:
   - `id`: key in the map (or implied by map key).
   - `block`: block type (must exist in schema).
@@ -37,7 +38,7 @@ A JSON-driven UI ecosystem: schema-defined blocks, flat content trees, and a plu
   - **Slots**: id reference(s) or, when schema allows, inline node(s) that are normalized to ids.
 - **Entry point**: One designated root id (e.g. `entryId` at top level) pointing into the node map.
 
-So: **schema defines per-slot whether id-only or id + inline**; **canonical form is always flat + ids**; normalization is a defined step when input uses inline.
+So: **schema has a global reference mode** (id / inline / both) that applies to all slots; **canonical form is always flat + ids**; normalization is a defined step when input uses inline.
 
 ### 2.3 Open design choices
 
@@ -89,7 +90,7 @@ All under the `@genetik` scope; names are placeholders to debate.
 | **Revisions** | **Drafts and published** + **linear history**. Use a **patches** concept to implement: history as patch sequence (or snapshots), rollback, promote draft → published. |
 | **LLM** | Support **both**: generate full JSON from scratch and edit existing JSON (e.g. LLM outputs a patch or updated definition). |
 | **Schema format** | **JSON Schema** per block type for block config. Standard, tooling-rich, validatable. |
-| **References** | Support **both** id and inline. The **schema defines per-slot** whether a slot accepts **id only**, **inline only**, or **both**. Inline nodes are normalized to flat + generated ids before storage and rendering; @genetik/content owns normalization. |
+| **References** | Support **both** id and inline. The **schema has a global option** (e.g. `slotReferenceMode`: **id** | **inline** | **both**) that applies to all slots. Inline nodes are normalized to flat + generated ids before storage and rendering; @genetik/content owns normalization. |
 | **Schema/content versioning** | **Yes.** Explicit schema version and/or content version fields for migrations and compatibility. |
 | **Theming** | **Separate plugin/package** (@genetik/theme or similar). Used by other packages when needed. Not part of core block config. |
 | **i18n** | **Its own plugin/package** (@genetik/i18n or similar). Used by other packages when needed. |

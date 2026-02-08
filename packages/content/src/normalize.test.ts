@@ -1,9 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { createSchema, registerBlockType } from "@genetik/schema";
+import { createSchema } from "@genetik/schema";
 import { normalizeContent, validateContent } from "./index.js";
-import type { BlockTypeDefinition } from "@genetik/schema";
+import type { BlockInput } from "@genetik/schema";
 
-const textBlock: BlockTypeDefinition = {
+const textBlock: BlockInput = {
   name: "text",
   configSchema: {
     type: "object",
@@ -13,20 +13,20 @@ const textBlock: BlockTypeDefinition = {
   slots: [],
 };
 
-const cardBlock: BlockTypeDefinition = {
+const cardBlock: BlockInput = {
   name: "card",
   configSchema: {
     type: "object",
     properties: { title: { type: "string" } },
   },
-  slots: [{ name: "children", multiple: true, referenceMode: "both" }],
+  slots: [{ name: "children", multiple: true }],
 };
 
 function schemaWithBlocks() {
-  const schema = createSchema();
-  registerBlockType(schema, textBlock);
-  registerBlockType(schema, cardBlock);
-  return schema;
+  return createSchema({
+    registerBlocks: [textBlock, cardBlock],
+    options: { slotReferenceMode: "both" },
+  });
 }
 
 describe("normalizeContent", () => {
@@ -65,10 +65,12 @@ describe("normalizeContent", () => {
     const result = normalizeContent(schema, input);
     expect(result.entryId).toBe("card1");
     expect(Object.keys(result.nodes).length).toBe(2);
-    expect(result.nodes.card1.children).toHaveLength(1);
-    const childId = (result.nodes.card1.children as string[])[0];
+    const card1 = result.nodes.card1;
+    expect(card1).toBeDefined();
+    expect(card1!.children).toHaveLength(1);
+    const childId = (card1!.children as string[])[0];
     expect(childId).toBeDefined();
-    expect(result.nodes[childId]).toEqual({
+    expect(result.nodes[childId!]).toEqual({
       id: childId,
       block: "text",
       config: { content: "Inline child" },
@@ -94,12 +96,16 @@ describe("normalizeContent", () => {
     };
     const result = normalizeContent(schema, input);
     expect(result.entryId).toBe("card1");
-    const children = result.nodes.card1.children as string[];
+    const card1 = result.nodes.card1;
+    expect(card1).toBeDefined();
+    const children = card1!.children as string[];
     expect(children[0]).toBe("existing-id");
     expect(children).toHaveLength(2);
     expect(result.nodes["existing-id"]).toEqual(input.nodes["existing-id"]);
-    expect(result.nodes[children[1]].block).toBe("text");
-    expect(result.nodes[children[1]].config).toEqual({ content: "New" });
+    const newChild = result.nodes[children[1]!];
+    expect(newChild).toBeDefined();
+    expect(newChild!.block).toBe("text");
+    expect(newChild!.config).toEqual({ content: "New" });
   });
 
   it("flattens nested inline nodes", () => {
@@ -123,14 +129,17 @@ describe("normalizeContent", () => {
     };
     const result = normalizeContent(schema, input);
     expect(result.entryId).toBe("card1");
-    const topChildren = result.nodes.card1.children as string[];
+    const card1 = result.nodes.card1;
+    expect(card1).toBeDefined();
+    const topChildren = card1!.children as string[];
     expect(topChildren).toHaveLength(1);
-    const innerCard = result.nodes[topChildren[0]];
-    expect(innerCard.block).toBe("card");
-    expect(innerCard.config).toEqual({ title: "Inner" });
-    const innerChildren = innerCard.children as string[];
+    const innerCard = result.nodes[topChildren[0]!];
+    expect(innerCard).toBeDefined();
+    expect(innerCard!.block).toBe("card");
+    expect(innerCard!.config).toEqual({ title: "Inner" });
+    const innerChildren = innerCard!.children as string[];
     expect(innerChildren).toHaveLength(1);
-    expect(result.nodes[innerChildren[0]]).toEqual({
+    expect(result.nodes[innerChildren[0]!]).toEqual({
       id: innerChildren[0],
       block: "text",
       config: { content: "Deep" },
@@ -153,9 +162,11 @@ describe("normalizeContent", () => {
       },
     };
     const result = normalizeContent(schema, input, { generateId });
-    const childId = (result.nodes.root.children as string[])[0];
+    const root = result.nodes.root;
+    expect(root).toBeDefined();
+    const childId = (root!.children as string[])[0];
     expect(childId).toBe("gen-1");
-    expect(result.nodes["gen-1"].config).toEqual({ content: "A" });
+    expect(result.nodes["gen-1"]!.config).toEqual({ content: "A" });
   });
 
   it("normalized content passes validation", () => {

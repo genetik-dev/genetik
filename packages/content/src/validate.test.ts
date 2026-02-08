@@ -1,9 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { createSchema, registerBlockType } from "@genetik/schema";
+import { createSchema } from "@genetik/schema";
 import { validateContent } from "./validate.js";
-import type { BlockTypeDefinition } from "@genetik/schema";
+import type { BlockInput } from "@genetik/schema";
 
-const textBlock: BlockTypeDefinition = {
+const textBlock: BlockInput = {
   name: "text",
   configSchema: {
     type: "object",
@@ -13,22 +13,17 @@ const textBlock: BlockTypeDefinition = {
   slots: [],
 };
 
-const cardBlock: BlockTypeDefinition = {
+const cardBlock: BlockInput = {
   name: "card",
   configSchema: {
     type: "object",
     properties: { title: { type: "string" } },
   },
-  slots: [
-    { name: "children", multiple: true, referenceMode: "id" },
-  ],
+  slots: [{ name: "children", multiple: true }],
 };
 
 function schemaWithBlocks() {
-  const schema = createSchema();
-  registerBlockType(schema, textBlock);
-  registerBlockType(schema, cardBlock);
-  return schema;
+  return createSchema({ registerBlocks: [textBlock, cardBlock] });
 }
 
 describe("validateContent", () => {
@@ -75,7 +70,8 @@ describe("validateContent", () => {
     expect(validateContent(schema, 1).valid).toBe(false);
     expect(validateContent(schema, []).valid).toBe(false);
     const r = validateContent(schema, null);
-    expect(r.errors[0].message).toContain("object");
+    expect(r.errors.length).toBeGreaterThan(0);
+    expect(r.errors[0]!.message).toContain("object");
   });
 
   it("returns invalid when entryId is missing or empty", () => {
