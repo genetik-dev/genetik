@@ -1,9 +1,9 @@
 {
   "name": "@genetik/typescript-config",
-  "version": "0.0.1",
-  "private": true,
+  "version": "0.0.0",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "files": ["base.json", "nextjs.json", "react-library.json"]
 }
