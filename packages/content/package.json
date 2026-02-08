@@ -1,8 +1,8 @@
 {
   "name": "@genetik/content",
-  "version": "0.0.1",
-  "private": true,
+  "version": "0.0.0",
   "type": "module",
+  "publishConfig": { "access": "public" },
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.mts",

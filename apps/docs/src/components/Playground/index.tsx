@@ -60,7 +60,7 @@ export default function Playground() {
           onChange={handleChange}
           spellCheck={false}
         />
-        {!parseResult.ok && (
+        {parseResult.ok === false && (
           <div className="playground__error" role="alert">
             {parseResult.error}
           </div>

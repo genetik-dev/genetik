@@ -68,6 +68,7 @@ pnpm --filter @genetik/content test
 ## Contributing
 
 - **Way of working**: [apps/docs/docs/development/way-of-working.md](apps/docs/docs/development/way-of-working.md) — small changes, tests, docs, then validate (lint + type-check).
+- **Releases**: When you change a publishable package, add a **changeset** so the next release can version and publish it: run `pnpm changeset` from the repo root, choose the packages and bump type, then commit the new file under `.changeset/`. See [.changeset/README.md](.changeset/README.md) and [docs/versioning-and-ci-plan.md](docs/versioning-and-ci-plan.md).
 - **Architecture**: [.cursor/rules](.cursor/rules) and [genetik-ecosystem-plan.md](genetik-ecosystem-plan.md).
 - **Agent guidance**: [AGENTS.md](AGENTS.md).
 

@@ -1,0 +1,52 @@
+# Version only: run changeset version, commit and push. No build or publish.
+# The resulting push triggers the release workflow.
+name: Version
+
+on:
+  push:
+    branches: [main]
+
+concurrency: version-${{ github.ref }}
+
+jobs:
+  version:
+    name: Version packages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Enable pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Version
+        id: version
+        run: |
+          pnpm changeset version
+          if git diff --quiet HEAD -- . ':!pnpm-lock.yaml'; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit and push
+        if: steps.version.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "chore: version packages"
+          git push
