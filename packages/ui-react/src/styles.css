@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+/* Source paths for Tailwind to scan (package components) */
+@source "./components/**/*.tsx";
+@source "./lib/**/*.ts";
+
+/* Design tokens — extend or override in consuming app as needed */
+@theme {
+  --color-border: oklch(0.906 0 0);
+  --color-input: oklch(0.906 0 0);
+  --color-ring: oklch(0.556 0 0);
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+}
