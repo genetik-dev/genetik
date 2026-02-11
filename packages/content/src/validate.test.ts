@@ -4,7 +4,7 @@ import { validateContent } from "./validate.js";
 import type { BlockInput } from "@genetik/schema";
 
 const textBlock: BlockInput = {
-  name: "text",
+  id: "text",
   configSchema: {
     type: "object",
     properties: { content: { type: "string" } },
@@ -14,7 +14,7 @@ const textBlock: BlockInput = {
 };
 
 const cardBlock: BlockInput = {
-  name: "card",
+  id: "card",
   configSchema: {
     type: "object",
     properties: { title: { type: "string" } },
@@ -23,7 +23,7 @@ const cardBlock: BlockInput = {
 };
 
 function schemaWithBlocks() {
-  return createSchema({ registerBlocks: [textBlock, cardBlock] });
+  return createSchema({ blocks: [textBlock, cardBlock] });
 }
 
 describe("validateContent", () => {

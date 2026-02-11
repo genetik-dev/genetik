@@ -26,7 +26,7 @@ import { resolve } from "@genetik/renderer";
 import type { GenetikSchema } from "@genetik/schema";
 
 const content = { entryId: "root", nodes: { root: { id: "root", block: "text", config: { content: "Hi" } } } };
-const schema: GenetikSchema = createSchema({ registerBlocks: [...] });
+const schema: GenetikSchema = createSchema({ blocks: [...] });
 
 const root = resolve(content, schema);
 // Or pass a JSON string:
@@ -54,7 +54,7 @@ interface ResolvedNode {
 | Export | Description |
 |--------|-------------|
 | `resolve(content, schema)` | Resolve content to the root ResolvedNode. `content` may be a `GenetikContent` object or a JSON string (parsed with parseContentJson). Returns null if content is invalid JSON, the entry node is missing, or resolution fails. |
-| `ResolvedNode` | Type: `{ block, config, slots }`. |
+| `ResolvedNode` | Type: `{ id, block, config, slots }`. |
 
 ## Package location and build
 

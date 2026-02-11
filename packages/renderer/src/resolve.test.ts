@@ -5,18 +5,18 @@ import type { GenetikContent } from "@genetik/content";
 import type { BlockInput } from "@genetik/schema";
 
 const textBlock: BlockInput = {
-  name: "text",
+  id: "text",
   configSchema: { type: "object", properties: { content: { type: "string" } } },
   slots: [],
 };
 
 const cardBlock: BlockInput = {
-  name: "card",
+  id: "card",
   configSchema: { type: "object", properties: { title: { type: "string" } } },
   slots: [{ name: "children", multiple: true }],
 };
 
-const schema = createSchema({ registerBlocks: [textBlock, cardBlock] });
+const schema = createSchema({ blocks: [textBlock, cardBlock] });
 
 describe("resolve", () => {
   it("returns null when entryId is missing from nodes", () => {

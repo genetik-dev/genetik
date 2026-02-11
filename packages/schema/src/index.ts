@@ -1,5 +1,8 @@
 export type {
+  BaseConfigProperty,
+  BaseConfigSchema,
   BlockInput,
+  BlockInputFromPlugins,
   BlockTypeDefinition,
   GenetikSchema,
   JsonSchema,
@@ -10,10 +13,12 @@ export type {
   SchemaPluginContext,
   SlotDefinition,
   SlotInput,
+  SlotLayoutHint,
   SlotReferenceMode,
 } from "./types.js";
 export {
   createSchema,
+  registerPlugins,
   getBlockType,
   getBlockTypeNames,
   hasBlockType,

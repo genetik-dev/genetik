@@ -4,7 +4,7 @@ import { normalizeContent, validateContent } from "./index.js";
 import type { BlockInput } from "@genetik/schema";
 
 const textBlock: BlockInput = {
-  name: "text",
+  id: "text",
   configSchema: {
     type: "object",
     properties: { content: { type: "string" } },
@@ -14,7 +14,7 @@ const textBlock: BlockInput = {
 };
 
 const cardBlock: BlockInput = {
-  name: "card",
+  id: "card",
   configSchema: {
     type: "object",
     properties: { title: { type: "string" } },
@@ -24,7 +24,7 @@ const cardBlock: BlockInput = {
 
 function schemaWithBlocks() {
   return createSchema({
-    registerBlocks: [textBlock, cardBlock],
+    blocks: [textBlock, cardBlock],
     options: { slotReferenceMode: "both" },
   });
 }

@@ -16,7 +16,7 @@ Requires `react` (>=18.0.0) as a peer dependency.
 
 ## Concepts
 
-- **Component map**: `Record<string, ComponentType<BlockProps>>` — maps each block type name to a React component that receives `config` and `slots`.
+- **Component map**: `Record<string, ComponentType<BlockProps>>` — maps each block type id to a React component that receives `config` and `slots`.
 - **BlockProps**: Every block component receives `config: Record<string, unknown>` and `slots: Record<string, ReactNode[]>` (each slot is an array of already-rendered children).
 - **Unknown blocks**: If a block type has no entry in the component map, that node is rendered as `null`.
 
@@ -28,7 +28,7 @@ import type { BlockProps } from "@genetik/renderer-react";
 import { createSchema } from "@genetik/schema";
 import type { GenetikContent } from "@genetik/content";
 
-const schema = createSchema({ registerBlocks: [textBlock, cardBlock] });
+const schema = createSchema({ blocks: [textBlock, cardBlock] });
 
 function TextBlock({ config }: BlockProps) {
   return <span>{(config as { content?: string }).content ?? ""}</span>;
