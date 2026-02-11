@@ -4,6 +4,39 @@
  * work well for content-centric websites.
  */
 
+/* Tailwind v4: scan docs src and @genetik/editor-react source (paths relative to this file) */
+
+@source "../**/*.ts";
+@source "../**/*.tsx";
+@source "../../../../packages/editor-react/src/**/*.ts";
+@source "../../../../packages/editor-react/src/**/*.tsx";
+
+@layer theme {
+  @import "tailwindcss/theme.css";
+}
+
+@layer base {
+  [data-twp] {
+    @import "tailwindcss/preflight.css";
+  }
+
+  [data-twp-reset] {
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+      all: revert-layer;
+    }
+  }
+}
+
+@layer components;
+
+@layer utilities {
+  @import "tailwindcss/utilities.css";
+}
+
 /* You can override the default Infima variables here. */
 :root {
   --ifm-color-primary: #2e8555;
@@ -18,7 +51,7 @@
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
-[data-theme='dark'] {
+[data-theme="dark"] {
   --ifm-color-primary: #25c2a0;
   --ifm-color-primary-dark: #21af90;
   --ifm-color-primary-darker: #1fa588;
@@ -72,7 +105,7 @@
   border-radius: var(--ifm-global-radius);
   font-size: 0.875rem;
 }
-[data-theme='dark'] .playground__error {
+[data-theme="dark"] .playground__error {
   background: color-mix(in srgb, var(--ifm-color-danger) 80%, black);
 }
 .playground__output {

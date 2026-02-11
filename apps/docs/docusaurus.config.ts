@@ -15,7 +15,8 @@ const config: Config = {
   },
 
   // Resolve @genetik/* to package source for HMR when editing packages (see plugins/genetik-source.cjs)
-  plugins: ['./plugins/genetik-source.cjs'],
+  // Tailwind v4 via PostCSS so editor-react styles compile in dev (no separate editor-react CSS build)
+  plugins: ['./plugins/genetik-source.cjs', './plugins/tailwind-postcss.cjs'],
 
   // Set the production url of your site here
   url: 'https://your-docusaurus-site.example.com',

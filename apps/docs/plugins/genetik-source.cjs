@@ -12,6 +12,7 @@ const PACKAGE_SRC_DIRS = [
   path.join(packagesDir, 'content', 'src'),
   path.join(packagesDir, 'renderer', 'src'),
   path.join(packagesDir, 'renderer-react', 'src'),
+  path.join(packagesDir, 'editor-react', 'src'),
 ];
 
 function isUnderPackageSrc(issuer) {
@@ -80,6 +81,7 @@ module.exports = function genetikSourcePlugin() {
             '@genetik/content': path.join(packagesDir, 'content', 'src', 'index.ts'),
             '@genetik/renderer': path.join(packagesDir, 'renderer', 'src', 'index.ts'),
             '@genetik/renderer-react': path.join(packagesDir, 'renderer-react', 'src', 'index.ts'),
+            '@genetik/editor-react': path.join(packagesDir, 'editor-react', 'src', 'index.ts'),
           },
           plugins: [new GenetikExtensionResolvePlugin()],
         },

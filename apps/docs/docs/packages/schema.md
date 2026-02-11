@@ -9,7 +9,7 @@ The schema package is the foundation of the Genetik ecosystem. It uses its own c
 ## Concepts
 
 - **Config API**: `createSchema({ registerBlocks, registerPlugins, version, options })` — distinct from JSON Schema; plugins can register blocks and add options.
-- **Block input**: When registering a block you supply **name**, **configSchema** (JSON Schema for that block's config), and **slots** with **name** and **multiple** only. No per-slot reference mode.
+- **Block input**: When registering a block you supply **name**, **configSchema** (JSON Schema for that block's config), and **slots** with **name** and **multiple** only. No per-slot reference mode. You can set **default** (or **defaultValue**) on config properties; when a block is added in the editor, `@genetik/editor`'s `getDefaultConfig` uses those values for the new block's config. You can set **editorInput** on a property (`"text"` | `"number"` | `"textarea"` | `"checkbox"`) so the editor side panel renders a matching form field instead of raw JSON; if omitted, the editor infers from the property's **type** (string → text, number → number, boolean → checkbox).
 - **Global reference mode**: **slotReferenceMode** is a schema-level option (`"id"` | `"inline"` | `"both"`). It applies to all slots. Default is `"id"`.
 - **Plugins**: Build-time only. A plugin receives a context and can `registerBlock(block)` and read/mutate `options`.
 - **Return value**: The schema instance has `blockTypes`, `meta`, **contentSchema** (JSON Schema for content), **options**, **version**, and getters: `getBlockType(name)`, `getBlockTypeNames()`, `hasBlockType(name)`.
@@ -47,7 +47,7 @@ const schema = createSchema({
       name: "card",
       configSchema: {
         type: "object",
-        properties: { title: { type: "string" } },
+        properties: { title: { type: "string", default: "hello world" } },
       },
       slots: [{ name: "children", multiple: true }],
     },
