@@ -4,11 +4,11 @@ import {
   dropTargetForElements,
 } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { combine } from "@atlaskit/pragmatic-drag-and-drop/combine";
-import { DRAG_TYPE_BLOCK_TYPE_CONST } from "./block-palette.js";
-import { DRAG_TYPE_NODE_CONST } from "./editor-dnd.js";
-import { DropPlaceholder } from "./drop-placeholder.js";
-import { useEditor } from "./use-editor.js";
-import { cn } from "./lib/utils.js";
+import { DRAG_TYPE_BLOCK_TYPE_CONST } from "./block-palette";
+import { DRAG_TYPE_NODE_CONST } from "./editor-dnd";
+import { DropPlaceholder } from "./drop-placeholder";
+import { useEditor } from "./use-editor";
+import { cn } from "./lib/utils";
 
 type DropEdge = "top" | "bottom" | "left" | "right";
 

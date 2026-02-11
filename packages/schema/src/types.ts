@@ -54,25 +54,45 @@ export interface SlotInput {
 export type JsonSchema = Record<string, unknown>;
 
 /**
+ * Base config property shape: type + optional default (and extra JSON Schema keys).
+ * Plugins can extend this (e.g. editor adds editorInput).
+ */
+export type BaseConfigProperty =
+  | { type: "string"; default?: string }
+  | { type: "number"; default?: number }
+  | { type: "integer"; default?: number }
+  | { type: "boolean"; default?: boolean }
+  | { type: "object"; default?: Record<string, unknown> }
+  | { type: "array"; default?: unknown[] };
+
+/**
+ * Base config schema for a block: object type with optional properties map.
+ */
+export interface BaseConfigSchema {
+  type?: "object";
+  properties?: Record<string, BaseConfigProperty>;
+  [key: string]: unknown;
+}
+
+/**
  * Block input when registering. Slots have no referenceMode (global on schema).
+ * Optional properties like addable are added by plugins (e.g. editor plugin).
  */
 export interface BlockInput {
-  /** Block type name (e.g. "hero", "card", "text"). */
-  name: string;
-  /** JSON Schema for this block's config. */
-  configSchema: JsonSchema;
-  /** Slots this block exposes. */
-  slots: SlotInput[];
-  /** When false, this block cannot be added from the palette or "+ Add block" (e.g. root-only blocks). Default true. */
-  addable?: boolean;
+  /** Block type id (e.g. "hero", "card", "text"). */
+  id: string;
+  /** Config schema for this block (properties with type/default). */
+  configSchema: BaseConfigSchema;
+  /** Slots this block exposes. Default [] when omitted. */
+  slots?: SlotInput[];
 }
 
 /**
  * Runtime block type: slots have referenceMode filled from schema options.
  */
 export interface BlockTypeDefinition {
-  /** Block type name (e.g. "hero", "card", "text"). */
-  name: string;
+  /** Block type id (e.g. "hero", "card", "text"). */
+  id: string;
   /** JSON Schema for this block's config. */
   configSchema: JsonSchema;
   /** Slots with referenceMode applied. */
@@ -104,17 +124,32 @@ export interface SchemaPluginContext {
 
 /**
  * Build-time plugin. Can register blocks and/or add options.
+ * When generic T is provided, the plugin extends the block type (e.g. EditorBlockInput);
+ * createSchema infers the intersection of all plugins' T for blocks.
  */
-export type SchemaPlugin = (context: SchemaPluginContext) => void;
+export type SchemaPlugin<TBlockInput extends BlockInput = BlockInput> = ((
+  context: SchemaPluginContext,
+) => void) & { readonly __blockInput?: TBlockInput };
 
 /**
- * Config for createSchema. Our API (not JSON Schema).
+ * Infers the block input type from a tuple of plugins (intersection of all plugin extensions).
  */
-export interface SchemaConfig {
-  /** Block types to register. */
-  registerBlocks?: BlockInput[];
+export type BlockInputFromPlugins<P extends readonly unknown[]> =
+  P extends readonly [SchemaPlugin<infer T>, ...infer R]
+    ? T & BlockInputFromPlugins<R>
+    : BlockInput;
+
+/**
+ * Config for createSchema. When P is a tuple of plugins, blocks is typed as
+ * the intersection of all plugins' block input types.
+ */
+export interface SchemaConfig<
+  P extends readonly SchemaPlugin[] = readonly SchemaPlugin[],
+> {
+  /** Block types to register. Typed from plugins when P is provided. */
+  blocks?: BlockInputFromPlugins<P>[];
   /** Plugins run in order; each can register blocks and add options. */
-  registerPlugins?: SchemaPlugin[];
+  plugins?: P;
   /** Schema version (e.g. "1.0.0"). */
   version?: string;
   /** Schema options (e.g. slotReferenceMode). Merged with plugin-added options. */

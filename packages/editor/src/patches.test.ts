@@ -10,14 +10,14 @@ import {
 } from "./patches.js";
 
 const schema = createSchema({
-  registerBlocks: [
+  blocks: [
     {
-      name: "text",
+      id: "text",
       configSchema: { type: "object" },
       slots: [],
     },
     {
-      name: "card",
+      id: "card",
       configSchema: { type: "object", properties: { title: { type: "string" } } },
       slots: [{ name: "children", multiple: true }],
     },
@@ -58,10 +58,10 @@ describe("createAddToSlotPatch", () => {
 
   it("uses default config from block configSchema when adding a block", () => {
     const schemaWithDefaults = createSchema({
-      registerBlocks: [
-        { name: "text", configSchema: { type: "object" }, slots: [] },
+      blocks: [
+        { id: "text", configSchema: { type: "object" }, slots: [] },
         {
-          name: "card",
+          id: "card",
           configSchema: {
             type: "object",
             properties: { title: { type: "string", default: "hello world" } },

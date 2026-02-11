@@ -14,7 +14,7 @@ import type {
   EditorAction,
   EditorContextValue,
   EditorProviderProps,
-} from "./types.js";
+} from "./types";
 
 export const EditorContext = createContext<EditorContextValue | null>(null);
 

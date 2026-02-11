@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { draggable } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
-import { useEditor } from "./use-editor.js";
-import { cn } from "./lib/utils.js";
+import { useEditor } from "./use-editor";
+import { cn } from "./lib/utils";
 
 export const DRAG_TYPE_BLOCK_TYPE = "blockType";
 

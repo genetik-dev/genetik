@@ -1,5 +1,8 @@
 export type {
+  BaseConfigProperty,
+  BaseConfigSchema,
   BlockInput,
+  BlockInputFromPlugins,
   BlockTypeDefinition,
   GenetikSchema,
   JsonSchema,
@@ -15,6 +18,7 @@ export type {
 } from "./types.js";
 export {
   createSchema,
+  registerPlugins,
   getBlockType,
   getBlockTypeNames,
   hasBlockType,

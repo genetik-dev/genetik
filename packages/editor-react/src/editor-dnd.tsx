@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
-import { useEditor } from "./use-editor.js";
-import { DRAG_TYPE_BLOCK_TYPE_CONST } from "./block-palette.js";
+import { useEditor } from "./use-editor";
+import { DRAG_TYPE_BLOCK_TYPE_CONST } from "./block-palette";
 
 const DRAG_TYPE_NODE = "node";
 

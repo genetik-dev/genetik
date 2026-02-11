@@ -26,7 +26,7 @@ import { resolve } from "@genetik/renderer";
 import type { GenetikSchema } from "@genetik/schema";
 
 const content = { entryId: "root", nodes: { root: { id: "root", block: "text", config: { content: "Hi" } } } };
-const schema: GenetikSchema = createSchema({ registerBlocks: [...] });
+const schema: GenetikSchema = createSchema({ blocks: [...] });
 
 const root = resolve(content, schema);
 // Or pass a JSON string:

@@ -2,11 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { Button } from "@genetik/ui-react";
-import { SlotPopover } from "./slot-popover.js";
-import { cn } from "./lib/utils.js";
-import { DRAG_TYPE_BLOCK_TYPE_CONST } from "./block-palette.js";
-import { DRAG_TYPE_NODE_CONST } from "./editor-dnd.js";
-import { useEditor } from "./use-editor.js";
+import { SlotPopover } from "./slot-popover";
+import { cn } from "./lib/utils";
+import { DRAG_TYPE_BLOCK_TYPE_CONST } from "./block-palette";
+import { DRAG_TYPE_NODE_CONST } from "./editor-dnd";
+import { useEditor } from "./use-editor";
 
 export interface SlotDropTargetProps {
   parentId: string;
@@ -41,8 +41,10 @@ export function SlotDropTarget({
     !slotFull &&
     currentDragSource &&
     (currentDragSource.type === "blockType"
-      ? allowedBlockTypes === undefined || allowedBlockTypes.includes(currentDragSource.blockType)
-      : allowedBlockTypes === undefined || allowedBlockTypes.includes(currentDragSource.blockType));
+      ? allowedBlockTypes === undefined ||
+        allowedBlockTypes.includes(currentDragSource.blockType)
+      : allowedBlockTypes === undefined ||
+        allowedBlockTypes.includes(currentDragSource.blockType));
 
   useEffect(() => {
     const el = ref.current;
@@ -87,14 +89,18 @@ export function SlotDropTarget({
         if (t === DRAG_TYPE_BLOCK_TYPE_CONST) {
           const blockType = source.data.blockType as string | undefined;
           setIsOver(
-            !!blockType && (allowedBlockTypes === undefined || allowedBlockTypes.includes(blockType))
+            !!blockType &&
+              (allowedBlockTypes === undefined ||
+                allowedBlockTypes.includes(blockType)),
           );
         } else if (t === DRAG_TYPE_NODE_CONST) {
           const nodeId = source.data.nodeId as string | undefined;
           const node = nodeId ? content.nodes[nodeId] : undefined;
           const blockType = node?.block as string | undefined;
           setIsOver(
-            !!blockType && (allowedBlockTypes === undefined || allowedBlockTypes.includes(blockType))
+            !!blockType &&
+              (allowedBlockTypes === undefined ||
+                allowedBlockTypes.includes(blockType)),
           );
         } else {
           setIsOver(false);
@@ -108,10 +114,10 @@ export function SlotDropTarget({
     <div
       ref={ref}
       className={cn(
-        "w-full min-h-8 rounded-md border-2 border-dashed p-2 transition-colors duration-150",
+        "w-full min-h-8 rounded-md border border-dashed p-2 transition-colors duration-150",
         layout === "row" && "flex flex-row flex-wrap items-stretch gap-2",
         layout === "column" && "flex flex-col gap-2",
-        isOver && "border-2 bg-(--editor-drop-bg,#eff6ff)",
+        isOver && "border bg-(--editor-drop-bg,#eff6ff)",
         !isOver && "border-[#ccc]",
         isValidDropTarget && !isOver && "ring-2 ring-blue-400 ring-offset-1",
         className,
@@ -129,9 +135,25 @@ export function SlotDropTarget({
           position={nodeIds.length}
           allowedBlockTypes={allowedBlockTypes}
         >
-          <Button type="button" size="sm" className="mt-2">
-            + Add block
-          </Button>
+          {layout === "row" ? (
+            <div className="flex items-stretch min-h-6">
+              <Button
+                type="button"
+                className="h-full w-8 flex-shrink-0 flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-600 rounded border-0 p-0 text-lg font-normal"
+                aria-label="Add block"
+              >
+                +
+              </Button>
+            </div>
+          ) : (
+            <Button
+              type="button"
+              className="w-full flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-600 rounded border-0 py-2 text-lg font-normal"
+              aria-label="Add block"
+            >
+              +
+            </Button>
+          )}
         </SlotPopover>
       )}
     </div>

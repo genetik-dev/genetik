@@ -65,9 +65,9 @@ import { validateContent } from "@genetik/content";
 import { createSchema } from "@genetik/schema";
 
 const schema = createSchema({
-  registerBlocks: [
+  blocks: [
     {
-      name: "text",
+      id: "text",
       configSchema: {
         type: "object",
         properties: { content: { type: "string" } },
@@ -110,14 +110,14 @@ import { normalizeContent, validateContent } from "@genetik/content";
 import { createSchema } from "@genetik/schema";
 
 const schema = createSchema({
-  registerBlocks: [
+  blocks: [
     {
-      name: "text",
+      id: "text",
       configSchema: { type: "object", properties: { content: { type: "string" } }, required: ["content"] },
       slots: [],
     },
     {
-      name: "card",
+      id: "card",
       configSchema: { type: "object", properties: { title: { type: "string" } } },
       slots: [{ name: "children", multiple: true }],
     },

@@ -19,66 +19,6 @@ import {
 } from "./blockComponents";
 import type { ComponentMap } from "@genetik/renderer-react";
 
-const DEFAULT_JSON = `{
-  "entryId": "root",
-  "nodes": {
-    "root": {
-      "id": "root",
-      "block": "page",
-      "config": {},
-      "children": ["mainRow"]
-    },
-    "mainRow": {
-      "id": "mainRow",
-      "block": "row",
-      "config": { "gap": "normal" },
-      "children": ["mainCol"]
-    },
-    "mainCol": {
-      "id": "mainCol",
-      "block": "column",
-      "config": {},
-      "children": ["intro", "hint", "sectionRow", "img1"]
-    },
-    "intro": {
-      "id": "intro",
-      "block": "text",
-      "config": { "content": "Edit the JSON or use the visual editor. Try: text, card, row, column, image." }
-    },
-    "hint": {
-      "id": "hint",
-      "block": "text",
-      "config": { "content": "A row lays out its children (columns) horizontally. A column lays out its children vertically." }
-    },
-    "sectionRow": {
-      "id": "sectionRow",
-      "block": "row",
-      "config": { "gap": "normal" },
-      "children": ["col1", "col2"]
-    },
-    "col1": {
-      "id": "col1",
-      "block": "column",
-      "config": {},
-      "children": ["col1text"]
-    },
-    "col1text": { "id": "col1text", "block": "text", "config": { "content": "Left column." } },
-    "col2": {
-      "id": "col2",
-      "block": "column",
-      "config": {},
-      "children": ["col2text"]
-    },
-    "col2text": { "id": "col2text", "block": "text", "config": { "content": "Right column." } },
-    "img1": {
-      "id": "img1",
-      "block": "image",
-      "config": { "src": "https://placehold.co/600x200?text=Placeholder", "alt": "Placeholder", "caption": "An image block." }
-    }
-  }
-}
-`;
-
 const INITIAL_CONTENT: GenetikContent = {
   entryId: "root",
   nodes: {
@@ -168,49 +108,55 @@ const componentMap: ComponentMap = {
 type PlaygroundMode = "json" | "visual";
 
 export default function Playground() {
-  const [raw, setRaw] = useState(DEFAULT_JSON);
+  const [content, setContent] = useState<GenetikContent>(INITIAL_CONTENT);
+  const [raw, setRaw] = useState(() =>
+    JSON.stringify(INITIAL_CONTENT, null, 2)
+  );
   const [mode, setMode] = useState<PlaygroundMode>("visual");
-  const [visualContent, setVisualContent] =
-    useState<GenetikContent>(INITIAL_CONTENT);
 
   const parseResult = useMemo(() => parseContentJson(raw), [raw]);
 
-  const contentForPreview =
-    mode === "visual"
-      ? visualContent
-      : parseResult.ok
-        ? parseResult.content
-        : null;
-
   const preview = useMemo(() => {
-    if (!contentForPreview) return null;
-    return renderContent(contentForPreview, playgroundSchema, componentMap);
-  }, [contentForPreview]);
+    return renderContent(content, playgroundSchema, componentMap);
+  }, [content]);
 
   const handleJsonChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      setRaw(e.target.value);
+      const next = e.target.value;
+      setRaw(next);
+      const result = parseContentJson(next);
+      if (result.ok) setContent(result.content);
     },
-    [],
+    []
   );
 
-  const handleVisualContentChange = useCallback((content: GenetikContent) => {
-    setVisualContent(content);
+  const handleVisualContentChange = useCallback((next: GenetikContent) => {
+    setContent(next);
   }, []);
+
+  const switchToJson = useCallback(() => {
+    setRaw(JSON.stringify(content, null, 2));
+    setMode("json");
+  }, [content]);
+
+  const switchToVisual = useCallback(() => {
+    if (parseResult.ok) setContent(parseResult.content);
+    setMode("visual");
+  }, [parseResult]);
 
   return (
     <div className="playground">
       <div style={{ marginBottom: 16 }}>
         <button
           type="button"
-          onClick={() => setMode("json")}
+          onClick={switchToJson}
           style={{ marginRight: 8, fontWeight: mode === "json" ? 600 : 400 }}
         >
           Edit JSON
         </button>
         <button
           type="button"
-          onClick={() => setMode("visual")}
+          onClick={switchToVisual}
           style={{ fontWeight: mode === "visual" ? 600 : 400 }}
         >
           Visual editor
@@ -243,7 +189,7 @@ export default function Playground() {
         <div data-twp>
           <EditorProvider
             schema={playgroundSchema}
-            content={visualContent}
+            content={content}
             onChange={handleVisualContentChange}
             componentMap={componentMap}
           >
@@ -270,12 +216,11 @@ export default function Playground() {
       <div className="playground__preview">
         <span className="playground__label">Preview</span>
         <div className="playground__output" data-twp>
-          {preview ??
-            (contentForPreview ? (
-              <span className="playground__muted">
-                Enter valid content JSON.
-              </span>
-            ) : null)}
+          {preview ?? (
+            <span className="playground__muted">
+              No preview.
+            </span>
+          )}
         </div>
       </div>
     </div>

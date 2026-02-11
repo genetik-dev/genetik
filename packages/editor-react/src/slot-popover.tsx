@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { ReactNode } from "react";
+import type { ReactElement } from "react";
 import {
   Button,
   Popover,
@@ -8,7 +8,7 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from "@genetik/ui-react";
-import { useEditor } from "./use-editor.js";
+import { useEditor } from "./use-editor";
 
 export interface SlotPopoverProps {
   parentId: string;
@@ -17,7 +17,7 @@ export interface SlotPopoverProps {
   /** When set, only these block types are shown. Omit to show all. */
   allowedBlockTypes?: string[];
   /** Trigger element (e.g. "+ Add block" button). Click opens the popover. */
-  children: ReactNode;
+  children: ReactElement;
 }
 
 export function SlotPopover({

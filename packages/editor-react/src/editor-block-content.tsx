@@ -1,9 +1,9 @@
 import { createElement } from "react";
 import { getBlockType } from "@genetik/schema";
 import { getSlotAllowedBlockTypes } from "@genetik/editor";
-import { useEditor } from "./use-editor.js";
-import { SlotDropTarget } from "./slot-drop-target.js";
-import { DraggableBlockWrapper } from "./draggable-block-wrapper.js";
+import { useEditor } from "./use-editor";
+import { SlotDropTarget } from "./slot-drop-target";
+import { DraggableBlockWrapper } from "./draggable-block-wrapper";
 
 export interface EditorBlockContentProps {
   nodeId: string;
@@ -38,6 +38,7 @@ export function EditorBlockContent({
 
     const slotContent = (
       <SlotDropTarget
+        key={slotDef.name}
         parentId={nodeId}
         slotName={slotDef.name}
         nodeIds={ids}

@@ -26,9 +26,7 @@ export function RowBlock({ config, slots }: BlockProps) {
   const gapClass =
     gap === "tight" ? "gap-2" : gap === "wide" ? "gap-6" : "gap-4";
   return (
-    <div className={`flex flex-row ${gapClass} p-3`}>
-      {slots.children ?? []}
-    </div>
+    <div className={`flex flex-row ${gapClass}`}>{slots.children ?? []}</div>
   );
 }
 

@@ -28,7 +28,7 @@ import type { BlockProps } from "@genetik/renderer-react";
 import { createSchema } from "@genetik/schema";
 import type { GenetikContent } from "@genetik/content";
 
-const schema = createSchema({ registerBlocks: [textBlock, cardBlock] });
+const schema = createSchema({ blocks: [textBlock, cardBlock] });
 
 function TextBlock({ config }: BlockProps) {
   return <span>{(config as { content?: string }).content ?? ""}</span>;

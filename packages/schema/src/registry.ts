@@ -1,10 +1,11 @@
 import type {
   BlockInput,
+  BlockInputFromPlugins,
   BlockTypeDefinition,
   GenetikSchema,
   JsonSchema,
-  SchemaConfig,
   SchemaOptions,
+  SchemaPlugin,
   SlotDefinition,
   SlotReferenceMode,
 } from "./types.js";
@@ -40,11 +41,14 @@ function toSlotDefinition(
   };
 }
 
-function toBlockTypeDefinition(block: BlockInput, referenceMode: SlotReferenceMode): BlockTypeDefinition {
+function toBlockTypeDefinition(
+  block: BlockInput & { addable?: boolean },
+  referenceMode: SlotReferenceMode
+): BlockTypeDefinition {
   return {
-    name: block.name,
+    id: block.id,
     configSchema: block.configSchema,
-    slots: block.slots.map((s) => toSlotDefinition(s, referenceMode)),
+    slots: (block.slots ?? []).map((s) => toSlotDefinition(s, referenceMode)),
     ...(block.addable === false && { addable: false }),
   };
 }
@@ -83,18 +87,40 @@ export interface SchemaInstance extends GenetikSchema {
   options: SchemaOptions;
   /** Schema version if set. */
   version?: string;
-  getBlockType(name: string): BlockTypeDefinition | undefined;
+  getBlockType(id: string): BlockTypeDefinition | undefined;
   getBlockTypeNames(): string[];
-  hasBlockType(name: string): boolean;
+  hasBlockType(id: string): boolean;
+}
+
+/**
+ * Returns the plugin tuple and a function that type-checks a block against the
+ * intersection of all plugin block types. Use with createSchema so blocks are
+ * typed from plugins (no need to import EditorBlockInput etc.). Example:
+ *   const { plugins, defineBlock } = registerPlugins([editorSchemaPlugin] as const);
+ *   const textBlock = defineBlock({ id: "text", configSchema: { ... }, slots: [] });
+ *   createSchema({ blocks: [textBlock], plugins });
+ */
+export function registerPlugins<P extends readonly SchemaPlugin[]>(plugins: P): {
+  plugins: P;
+  defineBlock: (block: BlockInputFromPlugins<P>) => BlockInputFromPlugins<P>;
+} {
+  return {
+    plugins,
+    defineBlock: (block) => block as BlockInputFromPlugins<P>,
+  };
 }
 
 /**
  * Creates a schema from config. Runs plugins (which can register blocks and add options),
  * then builds block types with global slotReferenceMode. Returns the schema with getters
  * and a contentSchema (JSON Schema for the content document).
+ * When plugins is a tuple of SchemaPlugin<T>, blocks is typed as the
+ * intersection of all T (e.g. use editorSchemaPlugin from @genetik/editor for editorInput).
  */
-export function createSchema(config: SchemaConfig): SchemaInstance {
-  const blocks: BlockInput[] = [...(config.registerBlocks ?? [])];
+export function createSchema<P extends readonly import("./types.js").SchemaPlugin[]>(
+  config: import("./types.js").SchemaConfig<P>
+): SchemaInstance {
+  const blocks: BlockInput[] = [...(config.blocks ?? [])];
   const options = resolveOptions(config.options);
 
   const context: import("./types.js").SchemaPluginContext = {
@@ -105,18 +131,18 @@ export function createSchema(config: SchemaConfig): SchemaInstance {
     version: config.version,
   };
 
-  for (const plugin of config.registerPlugins ?? []) {
+  for (const plugin of config.plugins ?? []) {
     plugin(context);
   }
 
   const referenceMode = (options.slotReferenceMode ?? DEFAULT_REFERENCE_MODE) as SlotReferenceMode;
   const blockTypes = new Map<string, BlockTypeDefinition>();
   for (const block of blocks) {
-    blockTypes.set(block.name, toBlockTypeDefinition(block, referenceMode));
+    blockTypes.set(block.id, toBlockTypeDefinition(block, referenceMode));
   }
 
-  const blockNames = Array.from(blockTypes.keys());
-  const contentSchema = buildContentSchema(blockNames);
+  const blockIds = Array.from(blockTypes.keys());
+  const contentSchema = buildContentSchema(blockIds);
 
   const schema: GenetikSchema = {
     blockTypes,
@@ -128,30 +154,30 @@ export function createSchema(config: SchemaConfig): SchemaInstance {
     contentSchema,
     options,
     version: config.version,
-    getBlockType(name: string) {
-      return blockTypes.get(name);
+    getBlockType(id: string) {
+      return blockTypes.get(id);
     },
     getBlockTypeNames() {
       return Array.from(blockTypes.keys());
     },
-    hasBlockType(name: string) {
-      return blockTypes.has(name);
+    hasBlockType(id: string) {
+      return blockTypes.has(id);
     },
   };
 }
 
 /**
- * Returns the block type definition for the given name, or undefined if not registered.
+ * Returns the block type definition for the given id, or undefined if not registered.
  */
-export function getBlockType(schema: GenetikSchema, name: string): BlockTypeDefinition | undefined {
-  return schema.blockTypes.get(name);
+export function getBlockType(schema: GenetikSchema, id: string): BlockTypeDefinition | undefined {
+  return schema.blockTypes.get(id);
 }
 
 /**
- * Returns true if the schema has a block type with the given name.
+ * Returns true if the schema has a block type with the given id.
  */
-export function hasBlockType(schema: GenetikSchema, name: string): boolean {
-  return schema.blockTypes.has(name);
+export function hasBlockType(schema: GenetikSchema, id: string): boolean {
+  return schema.blockTypes.has(id);
 }
 
 /**

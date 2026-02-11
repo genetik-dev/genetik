@@ -5,6 +5,12 @@ export {
   getDefaultConfig,
   getSlotAllowedBlockTypes,
 } from "./schema-helpers.js";
+export { editorSchemaPlugin } from "./schema-plugin.js";
+export type {
+  EditorConfigProperty,
+  EditorConfigSchema,
+  EditorBlockInput,
+} from "./schema-plugin.js";
 export {
   createAddToSlotPatch,
   createMoveToSlotPatch,

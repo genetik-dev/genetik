@@ -17,7 +17,7 @@ import {
   TabsTrigger,
   Textarea,
 } from "@genetik/ui-react";
-import { useEditor } from "./use-editor.js";
+import { useEditor } from "./use-editor";
 
 type EditorInputKind = "text" | "number" | "textarea" | "checkbox";
 

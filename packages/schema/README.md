@@ -20,7 +20,7 @@ import {
 
 const schema = createSchema({ version: "1.0.0" });
 registerBlockType(schema, {
-  name: "text",
+  id: "text",
   configSchema: { type: "object", properties: { content: { type: "string" } }, required: ["content"] },
   slots: [],
 });

@@ -8,18 +8,18 @@ import type { BlockProps } from "./types.js";
 import type { BlockInput } from "@genetik/schema";
 
 const textBlock: BlockInput = {
-  name: "text",
+  id: "text",
   configSchema: { type: "object", properties: { content: { type: "string" } } },
   slots: [],
 };
 
 const cardBlock: BlockInput = {
-  name: "card",
+  id: "card",
   configSchema: { type: "object", properties: { title: { type: "string" } } },
   slots: [{ name: "children", multiple: true }],
 };
 
-const schema = createSchema({ registerBlocks: [textBlock, cardBlock] });
+const schema = createSchema({ blocks: [textBlock, cardBlock] });
 
 function TextBlock({ config }: BlockProps) {
   return createElement("span", null, (config as { content?: string }).content ?? "");

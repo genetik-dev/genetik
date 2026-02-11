@@ -1,8 +1,10 @@
-import { createSchema } from "@genetik/schema";
-import type { BlockInput } from "@genetik/schema";
+import { createSchema, registerPlugins } from "@genetik/schema";
+import { editorSchemaPlugin } from "@genetik/editor";
 
-const textBlock: BlockInput = {
-  name: "text",
+const { plugins, defineBlock } = registerPlugins([editorSchemaPlugin] as const);
+
+const textBlock = defineBlock({
+  id: "text",
   configSchema: {
     type: "object",
     properties: {
@@ -15,10 +17,10 @@ const textBlock: BlockInput = {
     },
   },
   slots: [],
-};
+});
 
-const cardBlock: BlockInput = {
-  name: "card",
+const cardBlock = defineBlock({
+  id: "card",
   configSchema: {
     type: "object",
     properties: {
@@ -29,11 +31,17 @@ const cardBlock: BlockInput = {
       },
     },
   },
-  slots: [{ name: "children", multiple: false }],
-};
+  slots: [
+    {
+      name: "children",
+      multiple: false,
+      excludeBlockNames: ["card", "column"],
+    },
+  ],
+});
 
-const rowBlock: BlockInput = {
-  name: "row",
+const rowBlock = defineBlock({
+  id: "row",
   configSchema: {
     type: "object",
     properties: {
@@ -52,16 +60,23 @@ const rowBlock: BlockInput = {
       includeBlockNames: ["column"],
     },
   ],
-};
+});
 
-const columnBlock: BlockInput = {
-  name: "column",
+const columnBlock = defineBlock({
+  id: "column",
   configSchema: { type: "object" },
-  slots: [{ name: "children", multiple: true, layout: "column" }],
-};
+  slots: [
+    {
+      name: "children",
+      multiple: true,
+      layout: "column",
+      excludeBlockNames: ["column"],
+    },
+  ],
+});
 
-const imageBlock: BlockInput = {
-  name: "image",
+const imageBlock = defineBlock({
+  id: "image",
   configSchema: {
     type: "object",
     properties: {
@@ -82,24 +97,17 @@ const imageBlock: BlockInput = {
       },
     },
   },
-  slots: [],
-};
+});
 
 /** Root-only block: not addable from palette or "+ Add block". Only rows as direct children. */
-const pageBlock: BlockInput = {
-  name: "page",
+const pageBlock = defineBlock({
+  id: "page",
   configSchema: { type: "object" },
   slots: [{ name: "children", multiple: true, includeBlockNames: ["row"] }],
   addable: false,
-};
+});
 
 export const playgroundSchema = createSchema({
-  registerBlocks: [
-    textBlock,
-    cardBlock,
-    rowBlock,
-    columnBlock,
-    imageBlock,
-    pageBlock,
-  ],
+  blocks: [textBlock, cardBlock, rowBlock, columnBlock, imageBlock, pageBlock],
+  plugins,
 });

@@ -47,6 +47,9 @@ importers:
       '@genetik/schema':
         specifier: workspace:*
         version: link:../../packages/schema
+      '@genetik/ui-react':
+        specifier: workspace:*
+        version: link:../../packages/ui-react
       '@mdx-js/react':
         specifier: ^3.0.0
         version: 3.1.1(@types/react@19.2.2)(react@19.2.0)

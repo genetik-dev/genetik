@@ -1,13 +1,14 @@
 import { describe, it, expect } from "vitest";
 import { createSchema } from "@genetik/schema";
+import { editorSchemaPlugin } from "./schema-plugin.js";
 import { getAddableBlockTypes, getDefaultConfig, getSlotAllowedBlockTypes } from "./schema-helpers.js";
 
 describe("getDefaultConfig", () => {
   it("returns {} when block has no configSchema or no properties", () => {
     const schema = createSchema({
-      registerBlocks: [
-        { name: "empty", configSchema: { type: "object" }, slots: [] },
-        { name: "noProps", configSchema: { type: "object", properties: {} }, slots: [] },
+      blocks: [
+        { id: "empty", configSchema: { type: "object" }, slots: [] },
+        { id: "noProps", configSchema: { type: "object", properties: {} }, slots: [] },
       ],
     });
     expect(getDefaultConfig(schema, "empty")).toEqual({});
@@ -16,16 +17,16 @@ describe("getDefaultConfig", () => {
 
   it("returns {} for unknown block type", () => {
     const schema = createSchema({
-      registerBlocks: [{ name: "text", configSchema: { type: "object" }, slots: [] }],
+      blocks: [{ id: "text", configSchema: { type: "object" }, slots: [] }],
     });
     expect(getDefaultConfig(schema, "unknown")).toEqual({});
   });
 
   it("picks default from configSchema.properties (default keyword)", () => {
     const schema = createSchema({
-      registerBlocks: [
+      blocks: [
         {
-          name: "card",
+          id: "card",
           configSchema: {
             type: "object",
             properties: {
@@ -45,13 +46,13 @@ describe("getDefaultConfig", () => {
 
   it("picks defaultValue when default is not set", () => {
     const schema = createSchema({
-      registerBlocks: [
+      blocks: [
         {
-          name: "card",
+          id: "card",
           configSchema: {
             type: "object",
             properties: {
-              title: { type: "string", defaultValue: "hello world" },
+              title: { type: "string", default: "hello world" },
             },
           },
           slots: [],
@@ -63,13 +64,13 @@ describe("getDefaultConfig", () => {
 
   it("prefers default over defaultValue", () => {
     const schema = createSchema({
-      registerBlocks: [
+      blocks: [
         {
-          name: "card",
+          id: "card",
           configSchema: {
             type: "object",
             properties: {
-              title: { type: "string", default: "from default", defaultValue: "from defaultValue" },
+              title: { type: "string", default: "from default", defaultValue: "from defaultValue" } as { type: "string"; default?: string },
             },
           },
           slots: [],
@@ -81,9 +82,9 @@ describe("getDefaultConfig", () => {
 
   it("omits properties without default or defaultValue", () => {
     const schema = createSchema({
-      registerBlocks: [
+      blocks: [
         {
-          name: "card",
+          id: "card",
           configSchema: {
             type: "object",
             properties: {
@@ -101,11 +102,11 @@ describe("getDefaultConfig", () => {
 
 describe("getSlotAllowedBlockTypes", () => {
   const schema = createSchema({
-    registerBlocks: [
-      { name: "text", configSchema: { type: "object" }, slots: [] },
-      { name: "card", configSchema: { type: "object" }, slots: [] },
-      { name: "row", configSchema: { type: "object" }, slots: [] },
-      { name: "image", configSchema: { type: "object" }, slots: [] },
+    blocks: [
+      { id: "text", configSchema: { type: "object" }, slots: [] },
+      { id: "card", configSchema: { type: "object" }, slots: [] },
+      { id: "row", configSchema: { type: "object" }, slots: [] },
+      { id: "image", configSchema: { type: "object" }, slots: [] },
     ],
   });
 
@@ -138,9 +139,9 @@ describe("getSlotAllowedBlockTypes", () => {
 describe("getAddableBlockTypes", () => {
   it("returns all block types when none have addable: false", () => {
     const schema = createSchema({
-      registerBlocks: [
-        { name: "a", configSchema: { type: "object" }, slots: [] },
-        { name: "b", configSchema: { type: "object" }, slots: [] },
+      blocks: [
+        { id: "a", configSchema: { type: "object" }, slots: [] },
+        { id: "b", configSchema: { type: "object" }, slots: [] },
       ],
     });
     expect(getAddableBlockTypes(schema)).toEqual(["a", "b"]);
@@ -148,11 +149,12 @@ describe("getAddableBlockTypes", () => {
 
   it("excludes block types with addable: false", () => {
     const schema = createSchema({
-      registerBlocks: [
-        { name: "a", configSchema: { type: "object" }, slots: [] },
-        { name: "page", configSchema: { type: "object" }, slots: [], addable: false },
-        { name: "b", configSchema: { type: "object" }, slots: [] },
+      blocks: [
+        { id: "a", configSchema: { type: "object" }, slots: [] },
+        { id: "page", configSchema: { type: "object" }, slots: [], addable: false },
+        { id: "b", configSchema: { type: "object" }, slots: [] },
       ],
+      plugins: [editorSchemaPlugin] as const,
     });
     expect(getAddableBlockTypes(schema)).toEqual(["a", "b"]);
   });

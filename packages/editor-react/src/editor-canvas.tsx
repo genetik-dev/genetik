@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { useEditor } from "./use-editor.js";
-import { EditorBlockContent } from "./editor-block-content.js";
-import { BlockSurface } from "./block-surface.js";
-import { ConfigSidePanel } from "./config-side-panel.js";
+import { useEditor } from "./use-editor";
+import { EditorBlockContent } from "./editor-block-content";
+import { BlockSurface } from "./block-surface";
+import { ConfigSidePanel } from "./config-side-panel";
 
 export interface EditorCanvasProps {
   className?: string;

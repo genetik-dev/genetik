@@ -1,6 +1,6 @@
 import { useContext } from "react";
-import { EditorContext } from "./context.js";
-import type { EditorContextValue } from "./types.js";
+import { EditorContext } from "./context";
+import type { EditorContextValue } from "./types";
 
 export function useEditor(): EditorContextValue {
   const value = useContext(EditorContext);
