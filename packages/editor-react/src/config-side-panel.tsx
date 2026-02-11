@@ -1,7 +1,23 @@
 import { useEffect, useState } from "react";
 import { getBlockType } from "@genetik/schema";
+import {
+  Button,
+  Checkbox,
+  Input,
+  Label,
+  Sheet,
+  SheetBody,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  Textarea,
+} from "@genetik/ui-react";
 import { useEditor } from "./use-editor.js";
-import { cn } from "./lib/utils.js";
 
 type EditorInputKind = "text" | "number" | "textarea" | "checkbox";
 
@@ -109,72 +125,42 @@ export function ConfigSidePanel({
   };
 
   return (
-    <>
-      <div
-        className="fixed inset-0 z-40 bg-black/20"
-        aria-hidden
-        onClick={onClose}
-      />
-      <div
-        className="fixed right-0 top-0 z-50 flex h-full w-80 flex-col border-l border-[#ddd] bg-white shadow-lg"
-        role="dialog"
-        aria-labelledby="config-panel-title"
-      >
-        <div className="flex items-center justify-between border-b border-[#ddd] p-3">
-          <h2 id="config-panel-title" className="text-sm font-semibold">
-            Edit block
-          </h2>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded p-1 text-[#666] hover:bg-[#eee]"
-            aria-label="Close"
-          >
-            <span className="text-lg leading-none">×</span>
-          </button>
-        </div>
-        <div className="border-b border-[#ddd] px-3 py-2 text-xs text-[#666]">
-          {node.block} · {nodeId}
-        </div>
-        <div className="flex-1 overflow-auto p-3">
+    <Sheet open onOpenChange={(open) => !open && onClose()}>
+      <SheetContent showCloseButton>
+        <SheetHeader>
+          <SheetTitle id="config-panel-title">Edit block</SheetTitle>
+          <SheetDescription>
+            {node.block} · {nodeId}
+          </SheetDescription>
+        </SheetHeader>
+        <SheetBody>
           {hasFormFields && (
-            <div className="mb-2 flex gap-1 text-xs">
-              <button
-                type="button"
-                onClick={() => setUseRawJson(false)}
-                className={cn(
-                  "rounded px-2 py-1",
-                  !useRawJson && "bg-(--editor-drop-border,#2563eb) text-white"
-                )}
-              >
-                Fields
-              </button>
-              <button
-                type="button"
-                onClick={() => setUseRawJson(true)}
-                className={cn(
-                  "rounded px-2 py-1",
-                  useRawJson && "bg-(--editor-drop-border,#2563eb) text-white"
-                )}
-              >
-                Raw JSON
-              </button>
-            </div>
+            <Tabs
+              value={useRawJson ? "json" : "fields"}
+              onValueChange={(v: string) => setUseRawJson(v === "json")}
+              className="mb-2"
+            >
+              <TabsList variant="line" className="h-auto gap-1 p-0">
+                <TabsTrigger value="fields">Fields</TabsTrigger>
+                <TabsTrigger value="json">Raw JSON</TabsTrigger>
+              </TabsList>
+            </Tabs>
           )}
           {useRawJson ? (
             <>
-              <label className="mb-1 block text-xs font-medium text-[#444]">
+              <Label htmlFor="config-json" className="mb-1 block text-xs">
                 Config (JSON)
-              </label>
-              <textarea
+              </Label>
+              <Textarea
+                id="config-json"
                 value={json}
                 onChange={(e) => setJson(e.target.value)}
-                className="mb-2 h-40 w-full resize-y rounded border border-[#ccc] p-2 font-mono text-xs"
+                className="mb-2 min-h-40 font-mono text-xs"
                 spellCheck={false}
                 rows={10}
               />
               {error && (
-                <p className="mb-2 text-xs text-red-600" role="alert">
+                <p className="mb-2 text-xs text-destructive" role="alert">
                   {error}
                 </p>
               )}
@@ -185,27 +171,23 @@ export function ConfigSidePanel({
                 const kind = getEditorInputKind(propSchema ?? {});
                 const value = currentValue(key);
                 const label = key.replace(/_/g, " ");
+                const id = `config-${nodeId}-${key}`;
                 return (
                   <div key={key}>
-                    <label
-                      htmlFor={`config-${nodeId}-${key}`}
-                      className="mb-0.5 block text-xs font-medium text-[#444]"
-                    >
+                    <Label htmlFor={id} className="mb-0.5 block text-xs">
                       {label}
-                    </label>
+                    </Label>
                     {kind === "checkbox" ? (
-                      <input
-                        id={`config-${nodeId}-${key}`}
-                        type="checkbox"
+                      <Checkbox
+                        id={id}
                         checked={value === true}
-                        onChange={(e) =>
-                          updateFormValue(key, e.target.checked)
+                        onCheckedChange={(checked: boolean) =>
+                          updateFormValue(key, checked)
                         }
-                        className="rounded border border-[#ccc]"
                       />
                     ) : kind === "number" ? (
-                      <input
-                        id={`config-${nodeId}-${key}`}
+                      <Input
+                        id={id}
                         type="number"
                         value={
                           value === undefined || value === "" ? "" : Number(value)
@@ -217,23 +199,23 @@ export function ConfigSidePanel({
                             v === "" ? undefined : Number(v)
                           );
                         }}
-                        className="w-full rounded border border-[#ccc] px-2 py-1.5 text-xs"
+                        className="h-8 text-xs"
                       />
                     ) : kind === "textarea" ? (
-                      <textarea
-                        id={`config-${nodeId}-${key}`}
+                      <Textarea
+                        id={id}
                         value={
                           typeof value === "string" ? value : String(value ?? "")
                         }
                         onChange={(e) =>
                           updateFormValue(key, e.target.value)
                         }
-                        className="w-full rounded border border-[#ccc] px-2 py-1.5 font-mono text-xs"
+                        className="font-mono text-xs"
                         rows={4}
                       />
                     ) : (
-                      <input
-                        id={`config-${nodeId}-${key}`}
+                      <Input
+                        id={id}
                         type="text"
                         value={
                           typeof value === "string" ? value : String(value ?? "")
@@ -241,7 +223,7 @@ export function ConfigSidePanel({
                         onChange={(e) =>
                           updateFormValue(key, e.target.value)
                         }
-                        className="w-full rounded border border-[#ccc] px-2 py-1.5 text-xs"
+                        className="h-8 text-xs"
                       />
                     )}
                   </div>
@@ -249,17 +231,16 @@ export function ConfigSidePanel({
               })}
             </div>
           )}
-        </div>
-        <div className="border-t border-[#ddd] p-3">
-          <button
-            type="button"
+        </SheetBody>
+        <SheetFooter>
+          <Button
             onClick={useRawJson ? handleSaveJson : handleSaveForm}
-            className="rounded bg-(--editor-drop-border,#2563eb) px-3 py-1.5 text-xs text-white hover:opacity-90"
+            size="sm"
           >
             Save
-          </button>
-        </div>
-      </div>
-    </>
+          </Button>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   );
 }

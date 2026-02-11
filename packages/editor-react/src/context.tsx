@@ -1,4 +1,5 @@
-import { createContext, useCallback, useMemo, type ReactNode } from "react";
+import { createContext, useCallback, useMemo, useState, type ReactNode } from "react";
+import { getBlockType } from "@genetik/schema";
 import { applyPatch } from "@genetik/patches";
 import {
   createAddToSlotPatch,
@@ -6,9 +7,14 @@ import {
   createRemovePatch,
   createReorderPatch,
   createUpdateConfigPatch,
-  getAllowedBlockTypes,
+  getAddableBlockTypes,
 } from "@genetik/editor";
-import type { EditorAction, EditorContextValue, EditorProviderProps } from "./types.js";
+import type {
+  CurrentDragSource,
+  EditorAction,
+  EditorContextValue,
+  EditorProviderProps,
+} from "./types.js";
 
 export const EditorContext = createContext<EditorContextValue | null>(null);
 
@@ -19,12 +25,19 @@ export function EditorProvider({
   componentMap,
   children,
 }: EditorProviderProps & { children?: ReactNode }): React.ReactElement {
-  const allowedBlockTypes = useMemo(() => getAllowedBlockTypes(schema), [schema]);
+  const allowedBlockTypes = useMemo(() => getAddableBlockTypes(schema), [schema]);
+  const [currentDragSource, setCurrentDragSource] = useState<CurrentDragSource>(null);
 
   const dispatch = useCallback<EditorContextValue["dispatch"]>(
     (action: EditorAction) => {
       switch (action.type) {
         case "addBlock": {
+          const parent = content.nodes[action.parentId];
+          const blockType = parent ? getBlockType(schema, parent.block as string) : undefined;
+          const slotDef = blockType?.slots.find((s) => s.name === action.slotName);
+          const slotVal = parent?.[action.slotName as keyof typeof parent];
+          const currentLength = Array.isArray(slotVal) ? slotVal.length : typeof slotVal === "string" ? 1 : 0;
+          if (slotDef?.multiple === false && currentLength >= 1) break;
           const patch = createAddToSlotPatch(
             content,
             schema,
@@ -52,6 +65,12 @@ export function EditorProvider({
           break;
         }
         case "moveNode": {
+          const toParent = content.nodes[action.toParentId];
+          const toBlockType = toParent ? getBlockType(schema, toParent.block as string) : undefined;
+          const toSlotDef = toBlockType?.slots.find((s) => s.name === action.toSlotName);
+          const toSlotVal = toParent?.[action.toSlotName as keyof typeof toParent];
+          const toOrder: string[] = Array.isArray(toSlotVal) ? toSlotVal : typeof toSlotVal === "string" ? [toSlotVal] : [];
+          if (toSlotDef?.multiple === false && toOrder.length >= 1 && !toOrder.includes(action.nodeId)) break;
           const patch = createMoveToSlotPatch(
             content,
             action.nodeId,
@@ -82,8 +101,10 @@ export function EditorProvider({
       dispatch,
       allowedBlockTypes,
       componentMap,
+      currentDragSource,
+      setCurrentDragSource,
     }),
-    [content, schema, onChange, dispatch, allowedBlockTypes, componentMap]
+    [content, schema, onChange, dispatch, allowedBlockTypes, componentMap, currentDragSource]
   );
 
   return (

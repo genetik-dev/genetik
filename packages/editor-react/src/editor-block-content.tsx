@@ -1,22 +1,21 @@
 import { createElement } from "react";
 import { getBlockType } from "@genetik/schema";
+import { getSlotAllowedBlockTypes } from "@genetik/editor";
 import { useEditor } from "./use-editor.js";
 import { SlotDropTarget } from "./slot-drop-target.js";
 import { DraggableBlockWrapper } from "./draggable-block-wrapper.js";
 
 export interface EditorBlockContentProps {
   nodeId: string;
-  onAddClick: (parentId: string, slotName: string, position?: number) => void;
   renderBlock: (childId: string) => React.ReactNode;
 }
 
 /** Renders the actual block component (from componentMap) with editor slot wrappers and placeholders. */
 export function EditorBlockContent({
   nodeId,
-  onAddClick,
   renderBlock,
 }: EditorBlockContentProps): React.ReactElement | null {
-  const { content, schema, componentMap } = useEditor();
+  const { content, schema, componentMap, allowedBlockTypes: addableBlockTypes } = useEditor();
   const node = content.nodes[nodeId];
   if (!node) return null;
 
@@ -34,13 +33,17 @@ export function EditorBlockContent({
       : typeof value === "string"
         ? [value]
         : [];
+    const slotAllowed = getSlotAllowedBlockTypes(schema, slotDef);
+    const slotAllowedBlockTypes = slotAllowed.filter((t) => addableBlockTypes.includes(t));
 
     const slotContent = (
       <SlotDropTarget
         parentId={nodeId}
         slotName={slotDef.name}
         nodeIds={ids}
-        onAddClick={() => onAddClick(nodeId, slotDef.name)}
+        layout={slotDef.layout}
+        allowedBlockTypes={slotAllowedBlockTypes}
+        multiple={slotDef.multiple}
       >
         {ids.map((id, index) => (
           <DraggableBlockWrapper
@@ -49,6 +52,9 @@ export function EditorBlockContent({
             parentId={nodeId}
             slotName={slotDef.name}
             index={index}
+            slotLayout={slotDef.layout}
+            slotAllowedBlockTypes={slotAllowedBlockTypes}
+            slotMultiple={slotDef.multiple}
           >
             {renderBlock(id)}
           </DraggableBlockWrapper>

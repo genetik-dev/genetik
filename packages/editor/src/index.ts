@@ -1,5 +1,10 @@
 export { generateNodeId } from "./id.js";
-export { getAllowedBlockTypes, getDefaultConfig } from "./schema-helpers.js";
+export {
+  getAllowedBlockTypes,
+  getAddableBlockTypes,
+  getDefaultConfig,
+  getSlotAllowedBlockTypes,
+} from "./schema-helpers.js";
 export {
   createAddToSlotPatch,
   createMoveToSlotPatch,

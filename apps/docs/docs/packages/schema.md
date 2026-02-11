@@ -9,7 +9,7 @@ The schema package is the foundation of the Genetik ecosystem. It uses its own c
 ## Concepts
 
 - **Config API**: `createSchema({ registerBlocks, registerPlugins, version, options })` — distinct from JSON Schema; plugins can register blocks and add options.
-- **Block input**: When registering a block you supply **name**, **configSchema** (JSON Schema for that block's config), and **slots** with **name** and **multiple** only. No per-slot reference mode. You can set **default** (or **defaultValue**) on config properties; when a block is added in the editor, `@genetik/editor`'s `getDefaultConfig` uses those values for the new block's config. You can set **editorInput** on a property (`"text"` | `"number"` | `"textarea"` | `"checkbox"`) so the editor side panel renders a matching form field instead of raw JSON; if omitted, the editor infers from the property's **type** (string → text, number → number, boolean → checkbox).
+- **Block input**: When registering a block you supply **name**, **configSchema** (JSON Schema for that block's config), and **slots** with **name** and **multiple**. You can set **addable: false** so the block cannot be added from the palette or "+ Add block" (e.g. a root-only "page" block). Slots can optionally include **layout** (`"row"` | `"column"`) so the editor’s slot drop target matches the block’s layout (e.g. a row block’s children slot uses `layout: "row"` so columns render horizontally in the canvas). Slots can restrict allowed block types: **includeBlockNames** (only these types) or **excludeBlockNames** (exclude these); only one should be set. You can set **default** (or **defaultValue**) on config properties; when a block is added in the editor, `@genetik/editor`'s `getDefaultConfig` uses those values for the new block's config. You can set **editorInput** on a property (`"text"` | `"number"` | `"textarea"` | `"checkbox"`) so the editor side panel renders a matching form field instead of raw JSON; if omitted, the editor infers from the property's **type** (string → text, number → number, boolean → checkbox).
 - **Global reference mode**: **slotReferenceMode** is a schema-level option (`"id"` | `"inline"` | `"both"`). It applies to all slots. Default is `"id"`.
 - **Plugins**: Build-time only. A plugin receives a context and can `registerBlock(block)` and read/mutate `options`.
 - **Return value**: The schema instance has `blockTypes`, `meta`, **contentSchema** (JSON Schema for content), **options**, **version**, and getters: `getBlockType(name)`, `getBlockTypeNames()`, `hasBlockType(name)`.
@@ -108,7 +108,7 @@ if (result.valid) {
 | `validateConfig(schema, blockTypeName, config)` | Validate config against the block type's JSON Schema. |
 | `validateConfigAgainstDefinition(blockType, config)` | Validate config when you already have the block type definition. |
 
-Types: `BlockInput`, `BlockTypeDefinition`, `SlotInput`, `SlotDefinition`, `SlotReferenceMode`, `SchemaConfig`, `SchemaOptions`, `SchemaPlugin`, `SchemaPluginContext`, `SchemaInstance`, `GenetikSchema`, `SchemaMeta`, `JsonSchema`, `ValidationResult`.
+Types: `BlockInput`, `BlockTypeDefinition`, `SlotInput`, `SlotDefinition`, `SlotLayoutHint`, `SlotReferenceMode`, `SchemaConfig`, `SchemaOptions`, `SchemaPlugin`, `SchemaPluginContext`, `SchemaInstance`, `GenetikSchema`, `SchemaMeta`, `JsonSchema`, `ValidationResult`.
 
 ## Package location and build
 

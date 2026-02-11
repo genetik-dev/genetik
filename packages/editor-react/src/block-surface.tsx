@@ -1,18 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Button } from "@genetik/ui-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { useEditor } from "./use-editor.js";
 import { EditorBlockContent } from "./editor-block-content.js";
-import { EditIcon, TrashIcon } from "./editor-icons.js";
 
 export interface BlockSurfaceProps {
   nodeId: string;
-  onAddClick: (parentId: string, slotName: string, position?: number) => void;
   onEditClick?: (nodeId: string) => void;
 }
 
 /** Wrapper with hover state and edit/remove buttons; renders block via EditorBlockContent. */
 export function BlockSurface({
   nodeId,
-  onAddClick,
   onEditClick,
 }: BlockSurfaceProps): React.ReactElement | null {
   const { content, dispatch } = useEditor();
@@ -39,11 +38,9 @@ export function BlockSurface({
   const contentNode = (
     <EditorBlockContent
       nodeId={nodeId}
-      onAddClick={onAddClick}
       renderBlock={(id) => (
         <BlockSurface
           nodeId={id}
-          onAddClick={onAddClick}
           onEditClick={onEditClick}
         />
       )}
@@ -61,31 +58,35 @@ export function BlockSurface({
       onClick={() => setIsSelected(true)}
     >
       {showActions && (
-        <div className="absolute top-0 right-0 z-10 flex -translate-y-1/2 translate-x-1/2 gap-0.5">
+        <div className="absolute top-0 right-0 z-10 flex gap-0.5">
           {onEditClick && (
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="icon-xs"
               onClick={(e) => {
                 e.stopPropagation();
                 onEditClick(nodeId);
               }}
-              className="rounded p-1 text-[#666] hover:bg-[#eee] hover:text-[#2563eb] focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:ring-offset-1"
               aria-label="Edit block"
+              className="text-muted-foreground hover:text-primary"
             >
-              <EditIcon />
-            </button>
+              <Pencil />
+            </Button>
           )}
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="icon-xs"
             onClick={(e) => {
               e.stopPropagation();
               dispatch({ type: "removeBlock", nodeId });
             }}
-            className="rounded p-1 text-[#666] hover:bg-[#eee] hover:text-[#c00] focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:ring-offset-1"
             aria-label="Remove block"
+            className="text-muted-foreground hover:text-destructive"
           >
-            <TrashIcon />
-          </button>
+            <Trash2 />
+          </Button>
         </div>
       )}
       {contentNode}

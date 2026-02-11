@@ -1,6 +1,6 @@
 # @genetik/editor-react
 
-React UI for the Genetik content editor: drag blocks from a palette, drop into slots, click to add block via popover, remove and reorder. Uses **@atlaskit/pragmatic-drag-and-drop** and **@genetik/editor** for mutations.
+React UI for the Genetik content editor: drag blocks from a palette, drop into slots, click to add block via popover, remove and reorder. Uses **@atlaskit/pragmatic-drag-and-drop** and **@genetik/editor** for mutations. Editor chrome (config panel, block toolbar, add-block popover, drop placeholder) is built with **@genetik/ui-react** (shadcn-style components); ensure the host app imports `@genetik/ui-react/dist/styles.css` (and theme if needed) so the editor UI is styled correctly.
 
 ## Usage
 

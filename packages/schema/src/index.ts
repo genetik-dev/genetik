@@ -10,6 +10,7 @@ export type {
   SchemaPluginContext,
   SlotDefinition,
   SlotInput,
+  SlotLayoutHint,
   SlotReferenceMode,
 } from "./types.js";
 export {

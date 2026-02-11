@@ -7,6 +7,12 @@
 export type SlotReferenceMode = "id" | "inline" | "both";
 
 /**
+ * Optional layout hint for the slot in the editor (e.g. row = flex row, column = flex column).
+ * Editor UIs can use this so the slot drop target matches how the block will render.
+ */
+export type SlotLayoutHint = "row" | "column";
+
+/**
  * Slot definition at runtime: has referenceMode (from schema options).
  */
 export interface SlotDefinition {
@@ -16,16 +22,29 @@ export interface SlotDefinition {
   multiple: boolean;
   /** From schema options; whether the slot accepts id references, inline nodes, or both. */
   referenceMode: SlotReferenceMode;
+  /** Optional: layout hint for editor (e.g. so slot drop target uses flex row/column). */
+  layout?: SlotLayoutHint;
+  /** Optional: only these block types are allowed in this slot. Mutually exclusive with excludeBlockNames. */
+  includeBlockNames?: string[];
+  /** Optional: these block types are not allowed in this slot. Mutually exclusive with includeBlockNames. */
+  excludeBlockNames?: string[];
 }
 
 /**
  * Slot input when registering a block. No referenceMode — that comes from schema options.
+ * Only one of includeBlockNames or excludeBlockNames should be provided.
  */
 export interface SlotInput {
   /** Slot name (e.g. "children", "header", "footer"). */
   name: string;
   /** If true, slot holds an ordered list of nodes; if false, a single node. */
   multiple: boolean;
+  /** Optional: layout hint for editor so slot drop target matches block layout (row | column). */
+  layout?: SlotLayoutHint;
+  /** Optional: only these block types are allowed in this slot. Mutually exclusive with excludeBlockNames. */
+  includeBlockNames?: string[];
+  /** Optional: these block types are not allowed in this slot. Mutually exclusive with includeBlockNames. */
+  excludeBlockNames?: string[];
 }
 
 /**
@@ -44,6 +63,8 @@ export interface BlockInput {
   configSchema: JsonSchema;
   /** Slots this block exposes. */
   slots: SlotInput[];
+  /** When false, this block cannot be added from the palette or "+ Add block" (e.g. root-only blocks). Default true. */
+  addable?: boolean;
 }
 
 /**
@@ -56,6 +77,8 @@ export interface BlockTypeDefinition {
   configSchema: JsonSchema;
   /** Slots with referenceMode applied. */
   slots: SlotDefinition[];
+  /** When false, this block cannot be added from the palette or "+ Add block". Default true. */
+  addable?: boolean;
 }
 
 /**

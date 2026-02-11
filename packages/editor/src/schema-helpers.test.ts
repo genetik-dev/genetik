@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { createSchema } from "@genetik/schema";
-import { getDefaultConfig } from "./schema-helpers.js";
+import { getAddableBlockTypes, getDefaultConfig, getSlotAllowedBlockTypes } from "./schema-helpers.js";
 
 describe("getDefaultConfig", () => {
   it("returns {} when block has no configSchema or no properties", () => {
@@ -96,5 +96,64 @@ describe("getDefaultConfig", () => {
       ],
     });
     expect(getDefaultConfig(schema, "card")).toEqual({ title: "hello" });
+  });
+});
+
+describe("getSlotAllowedBlockTypes", () => {
+  const schema = createSchema({
+    registerBlocks: [
+      { name: "text", configSchema: { type: "object" }, slots: [] },
+      { name: "card", configSchema: { type: "object" }, slots: [] },
+      { name: "row", configSchema: { type: "object" }, slots: [] },
+      { name: "image", configSchema: { type: "object" }, slots: [] },
+    ],
+  });
+
+  it("returns all block types when slot has no include or exclude", () => {
+    const slot = { name: "children" as const, multiple: true as const, referenceMode: "id" as const };
+    expect(getSlotAllowedBlockTypes(schema, slot)).toEqual(["text", "card", "row", "image"]);
+  });
+
+  it("returns only includeBlockNames (intersected with schema) when set", () => {
+    const slot = {
+      name: "children" as const,
+      multiple: true as const,
+      referenceMode: "id" as const,
+      includeBlockNames: ["text", "card", "unknown"],
+    };
+    expect(getSlotAllowedBlockTypes(schema, slot)).toEqual(["text", "card"]);
+  });
+
+  it("returns all except excludeBlockNames when set", () => {
+    const slot = {
+      name: "children" as const,
+      multiple: true as const,
+      referenceMode: "id" as const,
+      excludeBlockNames: ["image"],
+    };
+    expect(getSlotAllowedBlockTypes(schema, slot)).toEqual(["text", "card", "row"]);
+  });
+});
+
+describe("getAddableBlockTypes", () => {
+  it("returns all block types when none have addable: false", () => {
+    const schema = createSchema({
+      registerBlocks: [
+        { name: "a", configSchema: { type: "object" }, slots: [] },
+        { name: "b", configSchema: { type: "object" }, slots: [] },
+      ],
+    });
+    expect(getAddableBlockTypes(schema)).toEqual(["a", "b"]);
+  });
+
+  it("excludes block types with addable: false", () => {
+    const schema = createSchema({
+      registerBlocks: [
+        { name: "a", configSchema: { type: "object" }, slots: [] },
+        { name: "page", configSchema: { type: "object" }, slots: [], addable: false },
+        { name: "b", configSchema: { type: "object" }, slots: [] },
+      ],
+    });
+    expect(getAddableBlockTypes(schema)).toEqual(["a", "b"]);
   });
 });

@@ -164,9 +164,15 @@ importers:
       '@genetik/schema':
         specifier: workspace:*
         version: link:../schema
+      '@genetik/ui-react':
+        specifier: workspace:*
+        version: link:../ui-react
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      lucide-react:
+        specifier: ^0.468.0
+        version: 0.468.0(react@19.2.0)
       tailwind-merge:
         specifier: ^2.6.0
         version: 2.6.1
@@ -177,9 +183,6 @@ importers:
       '@genetik/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
-      '@genetik/ui-react':
-        specifier: workspace:*
-        version: link:../ui-react
       '@tailwindcss/cli':
         specifier: ^4.0.0
         version: 4.1.18

@@ -18,11 +18,25 @@ function resolveOptions(configOptions?: SchemaOptions): SchemaOptions {
   };
 }
 
-function toSlotDefinition(slot: { name: string; multiple: boolean }, referenceMode: SlotReferenceMode): SlotDefinition {
+function toSlotDefinition(
+  slot: {
+    name: string;
+    multiple: boolean;
+    layout?: import("./types.js").SlotLayoutHint;
+    includeBlockNames?: string[];
+    excludeBlockNames?: string[];
+  },
+  referenceMode: SlotReferenceMode
+): SlotDefinition {
   return {
     name: slot.name,
     multiple: slot.multiple,
     referenceMode,
+    ...(slot.layout !== undefined && { layout: slot.layout }),
+    // Only one of include/exclude: prefer include when both are set
+    ...(slot.includeBlockNames !== undefined && { includeBlockNames: slot.includeBlockNames }),
+    ...(slot.excludeBlockNames !== undefined &&
+      slot.includeBlockNames === undefined && { excludeBlockNames: slot.excludeBlockNames }),
   };
 }
 
@@ -31,6 +45,7 @@ function toBlockTypeDefinition(block: BlockInput, referenceMode: SlotReferenceMo
     name: block.name,
     configSchema: block.configSchema,
     slots: block.slots.map((s) => toSlotDefinition(s, referenceMode)),
+    ...(block.addable === false && { addable: false }),
   };
 }
 

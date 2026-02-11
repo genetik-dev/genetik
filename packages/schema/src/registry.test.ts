@@ -40,6 +40,57 @@ describe("createSchema", () => {
     expect(card?.slots[1]).toEqual({ name: "footer", multiple: false, referenceMode: "id" });
   });
 
+  it("passes through optional slot layout hint", () => {
+    const schema = createSchema({
+      registerBlocks: [
+        {
+          name: "row",
+          configSchema: { type: "object" },
+          slots: [{ name: "children", multiple: true, layout: "row" }],
+        },
+      ],
+    });
+    const row = getBlockType(schema, "row");
+    expect(row?.slots[0]).toEqual({ name: "children", multiple: true, referenceMode: "id", layout: "row" });
+  });
+
+  it("passes through includeBlockNames and excludeBlockNames (prefer include when both set)", () => {
+    const schema = createSchema({
+      registerBlocks: [
+        {
+          name: "b",
+          configSchema: { type: "object" },
+          slots: [
+            { name: "only", multiple: true, includeBlockNames: ["text", "card"] },
+            { name: "noImage", multiple: true, excludeBlockNames: ["image"] },
+            {
+              name: "both",
+              multiple: true,
+              includeBlockNames: ["text"],
+              excludeBlockNames: ["card"],
+            },
+          ],
+        },
+      ],
+    });
+    const b = getBlockType(schema, "b");
+    expect(b?.slots[0]).toMatchObject({ includeBlockNames: ["text", "card"] });
+    expect(b?.slots[1]).toMatchObject({ excludeBlockNames: ["image"] });
+    expect(b?.slots[2]).toMatchObject({ includeBlockNames: ["text"] });
+    expect(b?.slots[2]).not.toHaveProperty("excludeBlockNames");
+  });
+
+  it("passes through addable: false for root-only blocks", () => {
+    const schema = createSchema({
+      registerBlocks: [
+        { name: "text", configSchema: { type: "object" }, slots: [] },
+        { name: "page", configSchema: { type: "object" }, slots: [{ name: "children", multiple: true }], addable: false },
+      ],
+    });
+    expect(getBlockType(schema, "text")?.addable).toBeUndefined();
+    expect(getBlockType(schema, "page")?.addable).toBe(false);
+  });
+
   it("applies global slotReferenceMode from options", () => {
     const schema = createSchema({
       registerBlocks: [cardBlock],

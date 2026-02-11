@@ -1,11 +1,42 @@
-import type { GenetikSchema } from "@genetik/schema";
+import type { GenetikSchema, SlotDefinition } from "@genetik/schema";
 import { getBlockType, getBlockTypeNames } from "@genetik/schema";
 
 /**
- * Returns all block type names registered in the schema (allowed for palette / add-block).
+ * Returns all block type names registered in the schema.
  */
 export function getAllowedBlockTypes(schema: GenetikSchema): string[] {
   return getBlockTypeNames(schema);
+}
+
+/**
+ * Returns block type names that can be added from the palette or "+ Add block".
+ * Excludes block types with addable: false (e.g. root-only blocks like "page").
+ */
+export function getAddableBlockTypes(schema: GenetikSchema): string[] {
+  return getBlockTypeNames(schema).filter((name) => {
+    const def = getBlockType(schema, name);
+    return def?.addable !== false;
+  });
+}
+
+/**
+ * Returns block type names allowed in the given slot.
+ * If the slot has includeBlockNames, returns the intersection with schema block types.
+ * If the slot has excludeBlockNames, returns all schema block types except those.
+ * Otherwise returns all schema block types.
+ */
+export function getSlotAllowedBlockTypes(
+  schema: GenetikSchema,
+  slotDef: SlotDefinition
+): string[] {
+  const all = getBlockTypeNames(schema);
+  if (slotDef.includeBlockNames !== undefined && slotDef.includeBlockNames.length > 0) {
+    return slotDef.includeBlockNames.filter((name) => all.includes(name));
+  }
+  if (slotDef.excludeBlockNames !== undefined && slotDef.excludeBlockNames.length > 0) {
+    return all.filter((name) => !slotDef.excludeBlockNames!.includes(name));
+  }
+  return all;
 }
 
 /**

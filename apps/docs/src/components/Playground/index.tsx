@@ -9,7 +9,14 @@ import {
   EditorCanvas,
 } from "@genetik/editor-react";
 import { playgroundSchema } from "./schema";
-import { TextBlock, CardBlock } from "./blockComponents";
+import {
+  PageBlock,
+  TextBlock,
+  CardBlock,
+  RowBlock,
+  ColumnBlock,
+  ImageBlock,
+} from "./blockComponents";
 import type { ComponentMap } from "@genetik/renderer-react";
 
 const DEFAULT_JSON = `{
@@ -17,19 +24,56 @@ const DEFAULT_JSON = `{
   "nodes": {
     "root": {
       "id": "root",
-      "block": "card",
-      "config": { "title": "Welcome" },
-      "children": ["intro", "hint"]
+      "block": "page",
+      "config": {},
+      "children": ["mainRow"]
+    },
+    "mainRow": {
+      "id": "mainRow",
+      "block": "row",
+      "config": { "gap": "normal" },
+      "children": ["mainCol"]
+    },
+    "mainCol": {
+      "id": "mainCol",
+      "block": "column",
+      "config": {},
+      "children": ["intro", "hint", "sectionRow", "img1"]
     },
     "intro": {
       "id": "intro",
       "block": "text",
-      "config": { "content": "Edit the JSON on the left to change this preview." }
+      "config": { "content": "Edit the JSON or use the visual editor. Try: text, card, row, column, image." }
     },
     "hint": {
       "id": "hint",
       "block": "text",
-      "config": { "content": "Use block types: \\"text\\" (config.content) and \\"card\\" (config.title, slot: children)." }
+      "config": { "content": "A row lays out its children (columns) horizontally. A column lays out its children vertically." }
+    },
+    "sectionRow": {
+      "id": "sectionRow",
+      "block": "row",
+      "config": { "gap": "normal" },
+      "children": ["col1", "col2"]
+    },
+    "col1": {
+      "id": "col1",
+      "block": "column",
+      "config": {},
+      "children": ["col1text"]
+    },
+    "col1text": { "id": "col1text", "block": "text", "config": { "content": "Left column." } },
+    "col2": {
+      "id": "col2",
+      "block": "column",
+      "config": {},
+      "children": ["col2text"]
+    },
+    "col2text": { "id": "col2text", "block": "text", "config": { "content": "Right column." } },
+    "img1": {
+      "id": "img1",
+      "block": "image",
+      "config": { "src": "https://placehold.co/600x200?text=Placeholder", "alt": "Placeholder", "caption": "An image block." }
     }
   }
 }
@@ -40,29 +84,85 @@ const INITIAL_CONTENT: GenetikContent = {
   nodes: {
     root: {
       id: "root",
-      block: "card",
-      config: { title: "Welcome" },
-      children: ["intro", "hint"],
+      block: "page",
+      config: {},
+      children: ["mainRow"],
+    },
+    mainRow: {
+      id: "mainRow",
+      block: "row",
+      config: { gap: "normal" },
+      children: ["mainCol"],
+    },
+    mainCol: {
+      id: "mainCol",
+      block: "column",
+      config: {},
+      children: ["intro", "hint", "sectionRow", "img1"],
     },
     intro: {
       id: "intro",
       block: "text",
-      config: { content: "Edit the JSON on the left to change this preview." },
+      config: {
+        content:
+          "Edit the JSON or use the visual editor. Try: text, card, row, column, image.",
+      },
     },
     hint: {
       id: "hint",
       block: "text",
       config: {
         content:
-          'Use block types: "text" (config.content) and "card" (config.title, slot: children).',
+          "A row lays out its children (columns) horizontally. A column lays out its children vertically.",
+      },
+    },
+    sectionRow: {
+      id: "sectionRow",
+      block: "row",
+      config: { gap: "normal" },
+      children: ["col1", "col2"],
+    },
+    col1: {
+      id: "col1",
+      block: "column",
+      config: {},
+      children: ["col1text"],
+    },
+    col1text: {
+      id: "col1text",
+      block: "text",
+      config: { content: "Left column." },
+    },
+    col2: {
+      id: "col2",
+      block: "column",
+      config: {},
+      children: ["col2text"],
+    },
+    col2text: {
+      id: "col2text",
+      block: "text",
+      config: { content: "Right column." },
+    },
+    img1: {
+      id: "img1",
+      block: "image",
+      config: {
+        src: "https://placehold.co/600x200?text=Placeholder",
+        alt: "Placeholder",
+        caption: "An image block.",
       },
     },
   },
 };
 
 const componentMap: ComponentMap = {
+  page: PageBlock,
   text: TextBlock,
   card: CardBlock,
+  row: RowBlock,
+  column: ColumnBlock,
+  image: ImageBlock,
 };
 
 type PlaygroundMode = "json" | "visual";
@@ -140,34 +240,36 @@ export default function Playground() {
       )}
 
       {mode === "visual" && (
-        <EditorProvider
-          schema={playgroundSchema}
-          content={visualContent}
-          onChange={handleVisualContentChange}
-          componentMap={componentMap}
-        >
-          <EditorDndProvider>
-            <div style={{ display: "flex", gap: 24, marginBottom: 24 }}>
-              <aside style={{ minWidth: 160 }}>
-                <strong style={{ display: "block", marginBottom: 8 }}>
-                  Blocks
-                </strong>
-                <BlockPalette />
-              </aside>
-              <div style={{ flex: 1 }}>
-                <strong style={{ display: "block", marginBottom: 8 }}>
-                  Canvas
-                </strong>
-                <EditorCanvas />
+        <div data-twp>
+          <EditorProvider
+            schema={playgroundSchema}
+            content={visualContent}
+            onChange={handleVisualContentChange}
+            componentMap={componentMap}
+          >
+            <EditorDndProvider>
+              <div style={{ display: "flex", gap: 24, marginBottom: 24 }}>
+                <aside style={{ minWidth: 160 }}>
+                  <strong style={{ display: "block", marginBottom: 8 }}>
+                    Blocks
+                  </strong>
+                  <BlockPalette />
+                </aside>
+                <div style={{ flex: 1 }}>
+                  <strong style={{ display: "block", marginBottom: 8 }}>
+                    Canvas
+                  </strong>
+                  <EditorCanvas />
+                </div>
               </div>
-            </div>
-          </EditorDndProvider>
-        </EditorProvider>
+            </EditorDndProvider>
+          </EditorProvider>
+        </div>
       )}
 
       <div className="playground__preview">
         <span className="playground__label">Preview</span>
-        <div className="playground__output">
+        <div className="playground__output" data-twp>
           {preview ??
             (contentForPreview ? (
               <span className="playground__muted">

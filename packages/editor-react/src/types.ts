@@ -45,6 +45,12 @@ export type EditorAction =
   | MoveNodeAction
   | UpdateBlockConfigAction;
 
+/** Source of the currently dragged item (set when drag starts, cleared on drop/cancel). */
+export type CurrentDragSource =
+  | { type: "blockType"; blockType: string }
+  | { type: "node"; nodeId: string; blockType: string }
+  | null;
+
 export interface EditorContextValue {
   content: GenetikContent;
   schema: GenetikSchema;
@@ -56,6 +62,10 @@ export interface EditorContextValue {
   allowedBlockTypes: string[];
   /** Optional: component map for rendering block preview in the canvas. */
   componentMap?: ComponentMap;
+  /** Current drag source when a block/block-type is being dragged; null otherwise. Used to highlight valid drop slots. */
+  currentDragSource: CurrentDragSource;
+  /** Set when drag starts, clear on drop/cancel. */
+  setCurrentDragSource: (source: CurrentDragSource) => void;
 }
 
 export interface EditorProviderProps {

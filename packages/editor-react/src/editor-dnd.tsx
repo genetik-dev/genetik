@@ -11,7 +11,7 @@ export interface EditorDndProviderProps {
 
 /** Registers a global monitor for drag-and-drop and dispatches add/reorder. */
 export function EditorDndProvider({ children }: EditorDndProviderProps): React.ReactElement {
-  const { content, dispatch } = useEditor();
+  const { content, dispatch, setCurrentDragSource } = useEditor();
 
   useEffect(() => {
     return monitorForElements({
@@ -22,6 +22,7 @@ export function EditorDndProvider({ children }: EditorDndProviderProps): React.R
         source: { data: Record<string, unknown> };
         location: { current: { dropTargets: Array<{ data: Record<string, unknown> }> } };
       }) => {
+        setCurrentDragSource(null);
         const dropTargets = location.current.dropTargets;
         const target = dropTargets[0];
         if (!target) return;
@@ -32,7 +33,7 @@ export function EditorDndProvider({ children }: EditorDndProviderProps): React.R
           slotName?: string;
           nodeIds?: string[];
           index?: number;
-          closestEdge?: "top" | "bottom";
+          closestEdge?: "top" | "bottom" | "left" | "right";
         };
         const sourceData = source.data as {
           type: string;
@@ -58,12 +59,20 @@ export function EditorDndProvider({ children }: EditorDndProviderProps): React.R
 
         // Add block from palette
         if (sourceData.type === DRAG_TYPE_BLOCK_TYPE_CONST && sourceData.blockType) {
+          const insertAfter =
+            targetData.closestEdge === "bottom" || targetData.closestEdge === "right";
+          const position =
+            targetData.type === "slot"
+              ? currentOrder.length
+              : insertAfter
+                ? Math.min(index + 1, currentOrder.length)
+                : index;
           dispatch({
             type: "addBlock",
             parentId,
             slotName,
             blockType: sourceData.blockType,
-            position: index,
+            position,
           });
           return;
         }
@@ -80,10 +89,12 @@ export function EditorDndProvider({ children }: EditorDndProviderProps): React.R
               ? currentOrder.indexOf(sourceData.nodeId)
               : -1;
           const isMovingDown = sourceIndex >= 0 && sourceIndex < (index ?? 0);
+          const insertAfter =
+            targetData.closestEdge === "bottom" || targetData.closestEdge === "right";
           const toIndex =
             targetData.type === "slot"
               ? currentOrder.length
-              : targetData.closestEdge === "bottom"
+              : insertAfter
                 ? isMovingDown
                   ? index ?? 0
                   : Math.min((index ?? 0) + 1, currentOrder.length)

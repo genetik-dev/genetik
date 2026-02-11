@@ -27,7 +27,9 @@
     "@genetik/patches": "workspace:*",
     "@genetik/renderer-react": "workspace:*",
     "@genetik/schema": "workspace:*",
+    "@genetik/ui-react": "workspace:*",
     "clsx": "^2.1.1",
+    "lucide-react": "^0.468.0",
     "tailwind-merge": "^2.6.0"
   },
   "peerDependencies": {

@@ -1,14 +1,26 @@
-/** Placeholder shown where a dragged block would land */
+import { EditorDropPlaceholder } from "@genetik/ui-react";
+
+/** Placeholder shown where a dragged block would land. Uses ui-react EditorDropPlaceholder. */
 export function DropPlaceholder({
   height = 48,
+  width,
+  stretchHeight,
+  minWidth,
 }: {
   height?: number;
+  /** When set, placeholder is sized for horizontal (left/right) insertion. */
+  width?: number;
+  /** When true, placeholder stretches to container height (e.g. in a flex row). */
+  stretchHeight?: boolean;
+  /** Minimum width when width is set. */
+  minWidth?: number;
 }): React.ReactElement {
   return (
-    <div
-      className="shrink-0 rounded bg-(--editor-drop-border,#2563eb)/20 border border-(--editor-drop-border,#2563eb) border-dashed min-h-8"
-      style={{ height: `${Math.max(height, 32)}px` }}
-      aria-hidden
+    <EditorDropPlaceholder
+      height={height}
+      width={width}
+      stretchHeight={stretchHeight}
+      minWidth={minWidth}
     />
   );
 }

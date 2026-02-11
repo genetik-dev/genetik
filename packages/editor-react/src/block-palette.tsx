@@ -40,6 +40,7 @@ function BlockPaletteItem({
 }): React.ReactElement {
   const ref = useRef<HTMLLIElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const { setCurrentDragSource } = useEditor();
 
   useEffect(() => {
     const el = ref.current;
@@ -48,10 +49,16 @@ function BlockPaletteItem({
     return draggable({
       element: el,
       getInitialData: () => ({ type: DRAG_TYPE_BLOCK_TYPE, blockType }),
-      onDragStart: () => setIsDragging(true),
-      onDrop: () => setIsDragging(false),
+      onDragStart: () => {
+        setIsDragging(true);
+        setCurrentDragSource({ type: "blockType", blockType });
+      },
+      onDrop: () => {
+        setIsDragging(false);
+        setCurrentDragSource(null);
+      },
     });
-  }, [blockType]);
+  }, [blockType, setCurrentDragSource]);
 
   return (
     <li

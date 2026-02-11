@@ -22,6 +22,7 @@
     "@genetik/content": "workspace:*",
     "@genetik/editor": "workspace:*",
     "@genetik/editor-react": "workspace:*",
+    "@genetik/ui-react": "workspace:*",
     "@genetik/renderer": "workspace:*",
     "@genetik/renderer-react": "workspace:*",
     "@genetik/schema": "workspace:*",
