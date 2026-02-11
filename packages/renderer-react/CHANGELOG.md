@@ -1,5 +1,15 @@
 # @genetik/renderer-react
 
+## 0.0.2
+
+### Patch Changes
+
+- f4ba8c9: implment basic react editor functionality
+- Updated dependencies [f4ba8c9]
+  - @genetik/renderer@0.0.2
+  - @genetik/content@0.0.2
+  - @genetik/schema@0.0.2
+
 ## 0.0.1
 
 ### Patch Changes
