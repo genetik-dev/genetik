@@ -16,6 +16,8 @@ The docs site **Playground** demonstrates both editing modes:
 - **Edit JSON** — Edit content as raw JSON; the preview updates when the JSON is valid.
 - **Visual editor** — Use the block palette and canvas to add/remove blocks and see the preview update. Drag block types from the palette onto slots, or use the slot popover to add blocks.
 
+Both modes share the same content state: switching between JSON and visual editor does not reset or desync content; the preview always reflects the current document.
+
 ## @genetik/editor (core)
 
 **Dependencies**: `@genetik/content`, `@genetik/patches`, `@genetik/schema`, `nanoid`.
@@ -23,12 +25,15 @@ The docs site **Playground** demonstrates both editing modes:
 **API**
 
 - `generateNodeId()` — Returns a new unique node id (nanoid).
-- `getAllowedBlockTypes(schema)` — Block types allowed by the schema.
-- `getDefaultConfig(schema, blockType)` — Default config for a new block (currently `{}`).
+- `getAllowedBlockTypes(schema)` — All block type ids from the schema.
+- `getAddableBlockTypes(schema)` — Block types that can be added from the palette or "+ Add block" (excludes blocks with `addable: false` from the editor plugin).
+- `getSlotAllowedBlockTypes(schema, slotDef)` — Block type ids allowed in a slot (respects slot `includeBlockNames` / `excludeBlockNames` and schema addability).
+- `getDefaultConfig(schema, blockType)` — Default config for a new block (uses each property's `default` or `defaultValue` from the block's configSchema).
 - `createAddToSlotPatch(content, schema, parentId, slotName, blockType, options?)` — Patch to add a new block to a slot.
 - `createRemovePatch(content, nodeId)` — Patch to remove a node.
 - `createReorderPatch(content, parentId, slotName, order)` — Patch to reorder a slot.
 - `createMoveToSlotPatch(content, nodeId, fromParentId, fromSlotName, toParentId, toSlotName, toIndex)` — Patch to move a node from one slot to another (or to another index in the same slot).
+- `createUpdateConfigPatch(content, nodeId, config)` — Patch to update a node's config.
 
 The host (e.g. editor-react) holds content in state, calls these to build patches, applies them with `applyPatch` from @genetik/patches, then updates state and calls `onChange(newContent)`.
 

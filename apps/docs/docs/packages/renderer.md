@@ -54,7 +54,7 @@ interface ResolvedNode {
 | Export | Description |
 |--------|-------------|
 | `resolve(content, schema)` | Resolve content to the root ResolvedNode. `content` may be a `GenetikContent` object or a JSON string (parsed with parseContentJson). Returns null if content is invalid JSON, the entry node is missing, or resolution fails. |
-| `ResolvedNode` | Type: `{ block, config, slots }`. |
+| `ResolvedNode` | Type: `{ id, block, config, slots }`. |
 
 ## Package location and build
 
