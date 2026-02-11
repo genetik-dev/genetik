@@ -66,11 +66,20 @@ class GenetikExtensionResolvePlugin {
  * In development: resolve @genetik/* to package source so the docs app
  * compiles them and HMR works when editing packages (no dependency on dist/).
  * In production: use built dist (default resolution).
+ * Always: disable fullySpecified for .m?js so node_modules subpaths (e.g.
+ * @atlaskit/pragmatic-drag-and-drop/combine) resolve without .js extension.
  */
 module.exports = function genetikSourcePlugin() {
   return {
     name: 'genetik-source-alias',
-    configureWebpack() {
+    configureWebpack(config) {
+      if (!config.module) config.module = {};
+      if (!Array.isArray(config.module.rules)) config.module.rules = [];
+      config.module.rules.push({
+        test: /\.m?js$/,
+        resolve: { fullySpecified: false },
+      });
+
       const isProduction = process.env.NODE_ENV === 'production';
       if (isProduction) return {};
 
