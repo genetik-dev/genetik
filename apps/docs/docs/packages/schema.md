@@ -8,11 +8,12 @@ The schema package is the foundation of the Genetik ecosystem. It uses its own c
 
 ## Concepts
 
-- **Config API**: `createSchema({ blocks, plugins, version, options })` — distinct from JSON Schema; plugins can register blocks and add options.
-- **Block input**: When registering a block you supply **id** (block type id), **configSchema** (JSON Schema for that block's config), and optional **slots** (default `[]`) with **name** and **multiple**. The **addable** property is defined by the editor plugin: set **addable: false** so the block cannot be added from the palette or "+ Add block" (e.g. a root-only "page" block). Slots can optionally include **layout** (`"row"` | `"column"`) so the editor’s slot drop target matches the block’s layout (e.g. a row block’s children slot uses `layout: "row"` so columns render horizontally in the canvas). Slots can restrict allowed block types: **includeBlockNames** (only these types) or **excludeBlockNames** (exclude these); only one should be set. You can set **default** (or **defaultValue**) on config properties; when a block is added in the editor, `@genetik/editor`'s `getDefaultConfig` uses those values for the new block's config. You can set **editorInput** on a property (`"text"` | `"number"` | `"textarea"` | `"checkbox"`) so the editor side panel renders a matching form field instead of raw JSON; if omitted, the editor infers from the property's **type** (string → text, number → number, boolean → checkbox).
+- **Config API**: `createSchema({ blocks, plugins, version, options, pageContextSchema })` — distinct from JSON Schema; plugins can register blocks, register page context properties, and add options.
+- **Block input**: When registering a block you supply **id** (block type id), **configSchema** (JSON Schema for that block's config), and optional **slots** (default `[]`) with **name** and **multiple**. The **addable** property is defined by the editor plugin: set **addable: false** so the block cannot be added from the palette or "+ Add block" (e.g. a root-only "page" block). Slots can optionally include **layout** (`"row"` | `"column"`) so the editor’s slot drop target matches the block’s layout (e.g. a row block’s children slot uses `layout: "row"` so columns render horizontally in the canvas). Slots can restrict allowed block types: **includeBlockNames** (only these types) or **excludeBlockNames** (exclude these); only one should be set. You can set **default** (or **defaultValue**) on config properties; when a block is added in the editor, `@genetik/editor`'s `getDefaultConfig` uses those values for the new block's config. You can set **editorInput** on a property (`"text"` | `"number"` | `"textarea"` | `"checkbox"`) so the editor side panel renders a matching form field instead of raw JSON; if omitted, the editor infers from the property's **type** (string → text, number → number, boolean → checkbox). Optional **availableContexts**: array of context keys (from the page context schema) this block can listen to in context overrides; the config panel uses this to show a dropdown of allowed context keys.
+- **Page context schema**: Optional **pageContextSchema** in config defines the shape of page context (properties with **type**, **default**, and optional **editorInput**). Plugins can add or override properties via **registerPageContextProperty(key, property)**. The resolved schema is on the schema instance as **pageContextSchema**; the editor uses it together with each block's **availableContexts** for the context-overrides dropdown.
 - **Global reference mode**: **slotReferenceMode** is a schema-level option (`"id"` | `"inline"` | `"both"`). It applies to all slots. Default is `"id"`.
-- **Plugins**: Build-time only. A plugin receives a context and can `registerBlock(block)` and read/mutate `options`.
-- **Return value**: The schema instance has `blockTypes`, `meta`, **contentSchema** (JSON Schema for content), **options**, **version**, and getters: `getBlockType(id)`, `getBlockTypeNames()`, `hasBlockType(id)`.
+- **Plugins**: Build-time only. A plugin receives a context and can `registerBlock(block)`, **registerPageContextProperty(key, property)**, and read/mutate `options`.
+- **Return value**: The schema instance has `blockTypes`, `meta`, **contentSchema** (JSON Schema for content), **options**, **version**, optional **pageContextSchema**, and getters: `getBlockType(id)`, `getBlockTypeNames()`, `hasBlockType(id)`.
 
 ## Installation
 
@@ -98,6 +99,48 @@ const schema = createSchema({
 });
 ```
 
+### Page context schema and availableContexts
+
+Define a page context schema so the editor can offer context keys in the block config panel (context overrides). Use **contextPlugin(contextSchema)** and pass it into **registerPlugins**:
+
+```ts
+import { createSchema, registerPlugins, contextPlugin } from "@genetik/schema";
+import { editorSchemaPlugin } from "@genetik/editor";
+
+const contextSchema = {
+  type: "object" as const,
+  properties: {
+    theme: { type: "string" as const, default: "light", editorInput: "text" as const },
+    role: { type: "string" as const, default: "viewer", editorInput: "text" as const },
+  },
+};
+
+const { plugins, defineBlock } = registerPlugins([
+  editorSchemaPlugin,
+  contextPlugin(contextSchema),
+] as const);
+
+createSchema({
+  blocks: [textBlock, cardBlock],
+  plugins,
+});
+```
+
+You can also pass **pageContextSchema** in createSchema config, or in a custom plugin call **registerPageContextProperty(key, property)** for each key.
+
+Blocks that can use context overrides declare **availableContexts** (keys from the page context schema):
+
+```ts
+defineBlock({
+  id: "text",
+  configSchema: { ... },
+  slots: [],
+  availableContexts: ["theme", "role"],
+});
+```
+
+The config panel then shows only those keys in the context-override dropdown for that block.
+
 ### Getters and contentSchema
 
 ```ts
@@ -127,14 +170,15 @@ if (result.valid) {
 | Export | Description |
 |--------|-------------|
 | `registerPlugins(pluginTuple)` | Returns `{ plugins, defineBlock }`. Use `plugins` in `createSchema` and `defineBlock(block)` to type-check blocks against the intersection of the plugins’ block types (e.g. `editorInput` from the editor plugin). |
-| `createSchema(config)` | Create a schema. Config: `blocks`, `plugins`, `version`, `options`. Returns schema instance with getters and `contentSchema`. |
+| `contextPlugin(contextSchema)` | Returns a schema plugin that registers the page context schema. Use in registerPlugins: `registerPlugins([editorSchemaPlugin, contextPlugin(contextSchema)] as const)`. |
+| `createSchema(config)` | Create a schema. Config: `blocks`, `plugins`, `version`, `options`, optional `pageContextSchema`. Returns schema instance with getters, `contentSchema`, and optional `pageContextSchema`. |
 | `getBlockType(schema, id)` | Get a block type by id. |
 | `hasBlockType(schema, id)` | Check if a block type exists. |
 | `getBlockTypeNames(schema)` | List all registered block type ids. |
 | `validateConfig(schema, blockTypeId, config)` | Validate config against the block type's JSON Schema. |
 | `validateConfigAgainstDefinition(blockType, config)` | Validate config when you already have the block type definition. |
 
-Types: `BlockInput`, `BlockInputFromPlugins`, `BlockTypeDefinition`, `SlotInput`, `SlotDefinition`, `SlotLayoutHint`, `SlotReferenceMode`, `SchemaConfig`, `SchemaOptions`, `SchemaPlugin`, `SchemaPluginContext`, `SchemaInstance`, `GenetikSchema`, `SchemaMeta`, `JsonSchema`, `ValidationResult`.
+Types: `BlockInput`, `BlockInputFromPlugins`, `BlockTypeDefinition`, `SlotInput`, `SlotDefinition`, `SlotLayoutHint`, `SlotReferenceMode`, `SchemaConfig`, `SchemaOptions`, `SchemaPlugin`, `SchemaPluginContext`, `SchemaInstance`, `GenetikSchema`, `SchemaMeta`, `JsonSchema`, `PageContextProperty`, `PageContextSchema`, `ValidationResult`.
 
 ## Package location and build
 

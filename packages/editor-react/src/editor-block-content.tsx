@@ -1,6 +1,9 @@
 import { createElement } from "react";
 import { getBlockType } from "@genetik/schema";
 import { getSlotAllowedBlockTypes } from "@genetik/editor";
+import { applyContextOverrides } from "@genetik/context-events";
+import { usePageRuntime } from "@genetik/renderer-react";
+import type { BlockProps } from "@genetik/renderer-react";
 import { useEditor } from "./use-editor";
 import { SlotDropTarget } from "./slot-drop-target";
 import { DraggableBlockWrapper } from "./draggable-block-wrapper";
@@ -8,14 +11,19 @@ import { DraggableBlockWrapper } from "./draggable-block-wrapper";
 export interface EditorBlockContentProps {
   nodeId: string;
   renderBlock: (childId: string) => React.ReactNode;
+  /** When true, still render the block when visibility is false (e.g. editor shows it dimmed). */
+  renderWhenHidden?: boolean;
 }
 
-/** Renders the actual block component (from componentMap) with editor slot wrappers and placeholders. */
+/** Renders the actual block component (from componentMap) with editor slot wrappers and placeholders.
+ * When the editor has context, applies context overrides (visibility/config) and passes context/updateContext to the block. */
 export function EditorBlockContent({
   nodeId,
   renderBlock,
+  renderWhenHidden = false,
 }: EditorBlockContentProps): React.ReactElement | null {
-  const { content, schema, componentMap, allowedBlockTypes: addableBlockTypes } = useEditor();
+  const { content, schema, componentMap, allowedBlockTypes: addableBlockTypes, context: editorContext } = useEditor();
+  const runtime = usePageRuntime();
   const node = content.nodes[nodeId];
   if (!node) return null;
 
@@ -24,6 +32,16 @@ export function EditorBlockContent({
 
   const Component = componentMap?.[node.block];
   if (!Component) return null;
+
+  const rawConfig = node.config as Record<string, unknown>;
+  let config = rawConfig;
+  let visible = true;
+  if (editorContext !== undefined && runtime) {
+    const result = applyContextOverrides(rawConfig, runtime.context);
+    config = result.config;
+    visible = result.visible;
+  }
+  if (!visible && !renderWhenHidden) return null;
 
   const slots: Record<string, React.ReactNode[]> = {};
   for (const slotDef of blockType.slots) {
@@ -65,8 +83,14 @@ export function EditorBlockContent({
     slots[slotDef.name] = [slotContent];
   }
 
-  return createElement(Component, {
-    config: node.config,
+  const blockProps: BlockProps = {
+    config,
     slots,
-  } as { config: Record<string, unknown>; slots: Record<string, React.ReactNode[]> });
+    ...(runtime && {
+      context: runtime.context,
+      updateContext: runtime.updateContext,
+      emit: runtime.emit,
+    }),
+  };
+  return createElement(Component, blockProps);
 }

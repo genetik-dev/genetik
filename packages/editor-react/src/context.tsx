@@ -9,6 +9,7 @@ import {
   createUpdateConfigPatch,
   getAddableBlockTypes,
 } from "@genetik/editor";
+import { PageRuntimeProvider } from "@genetik/renderer-react";
 import type {
   CurrentDragSource,
   EditorAction,
@@ -23,6 +24,9 @@ export function EditorProvider({
   content,
   onChange,
   componentMap,
+  context: pageContext,
+  onContextUpdate,
+  portalContainer,
   children,
 }: EditorProviderProps & { children?: ReactNode }): React.ReactElement {
   const allowedBlockTypes = useMemo(() => getAddableBlockTypes(schema), [schema]);
@@ -101,13 +105,27 @@ export function EditorProvider({
       dispatch,
       allowedBlockTypes,
       componentMap,
+      context: pageContext,
+      onContextUpdate,
       currentDragSource,
       setCurrentDragSource,
+      portalContainer,
     }),
-    [content, schema, onChange, dispatch, allowedBlockTypes, componentMap, currentDragSource]
+    [content, schema, onChange, dispatch, allowedBlockTypes, componentMap, pageContext, onContextUpdate, currentDragSource, portalContainer]
   );
 
-  return (
-    <EditorContext.Provider value={value}>{children}</EditorContext.Provider>
-  );
+  const inner = <EditorContext.Provider value={value}>{children}</EditorContext.Provider>;
+
+  if (pageContext !== undefined) {
+    return (
+      <PageRuntimeProvider
+        context={pageContext}
+        onContextUpdate={onContextUpdate}
+      >
+        {inner}
+      </PageRuntimeProvider>
+    );
+  }
+
+  return inner;
 }

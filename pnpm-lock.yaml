@@ -32,6 +32,9 @@ importers:
       '@genetik/content':
         specifier: workspace:*
         version: link:../../packages/content
+      '@genetik/context-events':
+        specifier: workspace:*
+        version: link:../../packages/context-events
       '@genetik/editor':
         specifier: workspace:*
         version: link:../../packages/editor
@@ -113,6 +116,27 @@ importers:
         specifier: ^2.1.8
         version: 2.1.9(@types/node@22.15.3)(jsdom@25.0.1)(lightningcss@1.30.2)(terser@5.46.0)
 
+  packages/context-events:
+    devDependencies:
+      '@genetik/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@genetik/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      eslint:
+        specifier: ^9.39.1
+        version: 9.39.1(jiti@2.6.1)
+      tsdown:
+        specifier: 0.20.3
+        version: 0.20.3(typescript@5.9.2)
+      typescript:
+        specifier: 5.9.2
+        version: 5.9.2
+      vitest:
+        specifier: ^2.1.8
+        version: 2.1.9(@types/node@22.15.3)(jsdom@25.0.1)(lightningcss@1.30.2)(terser@5.46.0)
+
   packages/editor:
     dependencies:
       '@genetik/content':
@@ -155,6 +179,9 @@ importers:
       '@genetik/content':
         specifier: workspace:*
         version: link:../content
+      '@genetik/context-events':
+        specifier: workspace:*
+        version: link:../context-events
       '@genetik/editor':
         specifier: workspace:*
         version: link:../editor
@@ -302,6 +329,9 @@ importers:
       '@genetik/content':
         specifier: workspace:*
         version: link:../content
+      '@genetik/context-events':
+        specifier: workspace:*
+        version: link:../context-events
       '@genetik/renderer':
         specifier: workspace:*
         version: link:../renderer

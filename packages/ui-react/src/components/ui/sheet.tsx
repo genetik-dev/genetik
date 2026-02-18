@@ -33,12 +33,15 @@ function SheetContent({
   className,
   children,
   showCloseButton = true,
+  container,
   ...props
 }: DialogPrimitive.Popup.Props & {
   showCloseButton?: boolean;
+  /** When set (e.g. to a [data-twp] ref), the sheet portals here so it shares scope with Select dropdowns. */
+  container?: HTMLElement | React.RefObject<HTMLElement | null> | null;
 }): React.ReactElement {
   return (
-    <SheetPortal>
+    <SheetPortal container={container}>
       <SheetOverlay />
       <DialogPrimitive.Popup
         data-slot="sheet-content"

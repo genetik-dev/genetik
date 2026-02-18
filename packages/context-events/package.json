@@ -1,6 +1,6 @@
 {
-  "name": "@genetik/renderer-react",
-  "version": "0.0.2",
+  "name": "@genetik/context-events",
+  "version": "0.0.1",
   "type": "module",
   "publishConfig": {
     "access": "public"
@@ -15,9 +15,7 @@
       "types": "./dist/index.d.mts"
     }
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "scripts": {
     "build": "tsdown",
     "dev": "tsdown --watch",
@@ -26,29 +24,10 @@
     "test": "vitest run",
     "test:watch": "vitest"
   },
-  "dependencies": {
-    "@genetik/context-events": "workspace:*",
-    "@genetik/content": "workspace:*",
-    "@genetik/renderer": "workspace:*",
-    "@genetik/schema": "workspace:*"
-  },
-  "peerDependencies": {
-    "react": ">=18.0.0"
-  },
-  "peerDependenciesMeta": {
-    "react-dom": {
-      "optional": true
-    }
-  },
   "devDependencies": {
     "@genetik/eslint-config": "workspace:*",
     "@genetik/typescript-config": "workspace:*",
-    "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.0.1",
     "eslint": "^9.39.1",
-    "jsdom": "^25.0.1",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
     "tsdown": "0.20.3",
     "typescript": "5.9.2",
     "vitest": "^2.1.8"

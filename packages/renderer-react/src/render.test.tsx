@@ -129,4 +129,66 @@ describe("renderContent", () => {
     expect(screen.getByText("A")).toBeInTheDocument();
     expect(screen.getByText("B")).toBeInTheDocument();
   });
+
+  it("wraps tree in PageRuntimeProvider and applies context overrides when options.context is passed", () => {
+    const content: GenetikContent = {
+      entryId: "root",
+      nodes: {
+        root: {
+          id: "root",
+          block: "text",
+          config: {
+            content: "Hidden when flag is true",
+            contextOverrides: [
+              {
+                contextPath: "flag",
+                condition: "eq",
+                contextValue: true,
+                effect: { type: "visibility", visible: false },
+              },
+            ],
+          },
+        },
+      },
+    };
+    const result = renderContent(content, schema, componentMap, {
+      context: { flag: true },
+    });
+    expect(result).not.toBeNull();
+    act(() => {
+      render(result as ReactElement);
+    });
+    expect(screen.queryByText("Hidden when flag is true")).not.toBeInTheDocument();
+  });
+
+  it("shows block when context does not match override", () => {
+    const content: GenetikContent = {
+      entryId: "root",
+      nodes: {
+        root: {
+          id: "root",
+          block: "text",
+          config: {
+            content: "Visible when flag is false",
+            contextOverrides: [
+              {
+                contextPath: "flag",
+                condition: "eq",
+                contextValue: true,
+                effect: { type: "visibility", visible: false },
+              },
+            ],
+          },
+        },
+      },
+    };
+    const result = renderContent(content, schema, componentMap, {
+      context: { flag: false },
+    });
+    expect(result).not.toBeNull();
+    act(() => {
+      render(result as ReactElement);
+    });
+    expect(screen.getByText("Visible when flag is false")).toBeInTheDocument();
+  });
 });

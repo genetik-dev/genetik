@@ -6,6 +6,8 @@ export type {
   BlockTypeDefinition,
   GenetikSchema,
   JsonSchema,
+  PageContextProperty,
+  PageContextSchema,
   SchemaConfig,
   SchemaMeta,
   SchemaOptions,
@@ -19,6 +21,7 @@ export type {
 export {
   createSchema,
   registerPlugins,
+  contextPlugin,
   getBlockType,
   getBlockTypeNames,
   hasBlockType,
