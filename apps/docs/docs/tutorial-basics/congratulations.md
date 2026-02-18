@@ -2,22 +2,21 @@
 sidebar_position: 6
 ---
 
-# Congratulations!
+# Congratulations
 
-You have just learned the **basics of Docusaurus** and made some changes to the **initial template**.
+You've walked through the main pieces of this **tutorial**:
 
-Docusaurus has **much more to offer**!
+1. **Schema** — Block types with config and slots, plus context and editor plugin.
+2. **Block components** — React components for each block, used by both editor and preview.
+3. **Editor** — `EditorProvider`, `EditorDndProvider`, `BlockPalette`, and `EditorCanvas` with content state and optional context.
+4. **JSON mode and preview** — `parseContentJson` for raw editing and `renderContent` for live preview.
 
-Have **5 more minutes**? Take a look at **[versioning](../tutorial-extras/manage-docs-versions.md)** and **[i18n](../tutorial-extras/translate-your-site.md)**.
+Try the [Playground](/playground) to see it in action, and explore the source in this repo for the full schema, block components, and page wiring.
 
-Anything **unclear** or **buggy** in this tutorial? [Please report it!](https://github.com/facebook/docusaurus/discussions/4610)
+## Learn more
 
-## What's next?
-
-- Read the [official documentation](https://docusaurus.io/)
-- Modify your site configuration with [`docusaurus.config.js`](https://docusaurus.io/docs/api/docusaurus-config)
-- Add navbar and footer items with [`themeConfig`](https://docusaurus.io/docs/api/themes/configuration)
-- Add a custom [Design and Layout](https://docusaurus.io/docs/styling-layout)
-- Add a [search bar](https://docusaurus.io/docs/search)
-- Find inspirations in the [Docusaurus showcase](https://docusaurus.io/showcase)
-- Get involved in the [Docusaurus Community](https://docusaurus.io/community/support)
+- [@genetik/schema](/docs/packages/schema) — Schema and block definitions
+- [@genetik/editor](/docs/packages/editor) — Editor mutations and schema plugin
+- [@genetik/editor-react](/docs/packages/editor) — React editor components
+- [@genetik/renderer-react](/docs/packages/renderer-react) — Rendering content with a component map
+- [@genetik/content](/docs/packages/content) — Content type and parsing

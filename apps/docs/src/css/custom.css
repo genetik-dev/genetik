@@ -16,6 +16,9 @@
 @source "../../../../packages/ui-react/src/**/*.ts";
 @source "../../../../packages/ui-react/src/**/*.tsx";
 
+/* Tailwind dark: variant when Docusaurus uses data-theme="dark" */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 @theme {
   --color-border: oklch(0.906 0 0);
   --color-input: oklch(0.906 0 0);
@@ -62,7 +65,7 @@
   @import "tailwindcss/utilities.css";
 }
 
-/* You can override the default Infima variables here. */
+/* Light theme (default) */
 :root {
   --ifm-color-primary: #2e8555;
   --ifm-color-primary-dark: #29784c;
@@ -73,6 +76,11 @@
   --ifm-color-primary-lightest: #3cad6e;
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --ifm-background-color: #fff;
+  --ifm-font-color-base: #1a1a1a;
+  --ifm-heading-color: #1a1a1a;
+  --ifm-navbar-background-color: #fff;
+  --ifm-footer-background-color: #f5f5f5;
 
   --radius: 0.625rem;
   --background: oklch(1 0 0);
@@ -86,14 +94,14 @@
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
+  --muted-foreground: oklch(0.45 0 0);
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --border: oklch(0.906 0 0);
+  --input: oklch(0.906 0 0);
+  --ring: oklch(0.556 0 0);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -106,7 +114,7 @@
   --sidebar-accent: oklch(0.97 0 0);
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar-ring: oklch(0.556 0 0);
 }
 
 /* Fallback: Tailwind v4 may not generate .bg-background (reserved name) */
@@ -120,16 +128,153 @@
   z-index: 1100 !important;
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
+/* Dark theme (Vercel-style): green primary, brighter for dark backgrounds */
 [data-theme="dark"] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --ifm-color-primary: #34d399;
+  --ifm-color-primary-dark: #2dd4a0;
+  --ifm-color-primary-darker: #22c55e;
+  --ifm-color-primary-darkest: #16a34a;
+  --ifm-color-primary-light: #6ee7b7;
+  --ifm-color-primary-lighter: #a7f3d0;
+  --ifm-color-primary-lightest: #d1fae5;
+  --docusaurus-highlighted-code-line-bg: rgba(255, 255, 255, 0.06);
+  --ifm-background-color: #000;
+  --ifm-font-color-base: #e5e5e5;
+  --ifm-heading-color: #fff;
+  --ifm-navbar-background-color: #000;
+  --ifm-footer-background-color: #000;
+  /* Infima emphasis + surface for playground/editor blocks and buttons */
+  --ifm-color-emphasis-100: #1f1f1f;
+  --ifm-color-emphasis-200: #2a2a2a;
+  --ifm-color-emphasis-300: #3a3a3a;
+  --ifm-color-emphasis-600: #a3a3a3;
+  --ifm-background-surface-color: #0a0a0a;
+  /* Content editor: block palette items (dark bg so text is readable) */
+  --editor-palette-item-bg: #2a2a2a;
+  --editor-drop-bg: rgba(52, 211, 153, 0.12);
+  /* Tailwind/ui-react theme vars so dark: classes and components get dark colors */
+  --color-background: oklch(0.1 0 0);
+  --color-foreground: oklch(0.95 0 0);
+  --color-border: oklch(0.3 0 0);
+  --color-input: oklch(0.2 0 0);
+  --color-muted: oklch(0.2 0 0);
+  --color-muted-foreground: oklch(0.65 0 0);
+  --color-card: oklch(0.12 0 0);
+  --color-card-foreground: oklch(0.95 0 0);
+  --color-popover: oklch(0.18 0 0);
+  --color-popover-foreground: oklch(0.95 0 0);
+  --color-accent: oklch(0.25 0 0);
+  --color-accent-foreground: oklch(0.95 0 0);
+  --color-primary: oklch(0.65 0.15 160);
+  --color-primary-foreground: oklch(0.12 0 0);
+}
+
+[data-theme="dark"] html,
+[data-theme="dark"] body {
+  background: #000;
+}
+
+[data-theme="dark"] .navbar {
+  background: #000 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+[data-theme="dark"] .navbar__link {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+[data-theme="dark"] .navbar__link:hover {
+  color: #fff !important;
+}
+[data-theme="dark"] .navbar-sidebar {
+  background: #000 !important;
+}
+
+/* Navbar logo uses currentColor → black; invert in dark mode so it's visible on black bar */
+[data-theme="dark"] .navbar__brand img {
+  filter: invert(1);
+}
+
+[data-theme="dark"] .main-wrapper,
+[data-theme="dark"] .main-wrapper .main-wrapper__content,
+[data-theme="dark"] article,
+[data-theme="dark"] .docs-wrapper {
+  background: #000;
+}
+[data-theme="dark"] .markdown {
+  --ifm-heading-color: #fff;
+  --ifm-color-content: #e5e5e5;
+}
+[data-theme="dark"] footer.footer {
+  background: #000 !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+[data-theme="dark"] .footer__link-item {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+[data-theme="dark"] .footer__link-item:hover {
+  color: #fff !important;
+}
+[data-theme="dark"] .footer__title {
+  color: #fff !important;
+}
+[data-theme="dark"] .footer__bottom {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+[data-theme="dark"] .footer__logo {
+  opacity: 0.9;
+}
+
+/* Content editor: drop target border (editor-react uses dark: now; this reinforces) */
+[data-theme="dark"] [data-editor-canvas] [data-slot] {
+  border-color: var(--ifm-color-emphasis-300) !important;
+}
+
+/* Navbar CTA buttons: shared layout, theme-dependent colors */
+.navbar-btn {
+  margin-left: 0.5rem;
+  margin-right: 1.25rem;
+  padding: 0.5rem 1rem !important;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+/* Light: outline = dark border, primary = dark fill */
+.navbar-btn--outline {
+  border: 1px solid rgba(0, 0, 0, 0.2) !important;
+  color: #1a1a1a !important;
+  background: transparent !important;
+}
+.navbar-btn--outline:hover {
+  background: rgba(0, 0, 0, 0.05) !important;
+  color: #1a1a1a !important;
+}
+.navbar-btn--primary {
+  border: 1px solid #1a1a1a !important;
+  color: #fff !important;
+  background: #1a1a1a !important;
+}
+.navbar-btn--primary:hover {
+  background: #333 !important;
+  color: #fff !important;
+  border-color: #333 !important;
+}
+/* Dark: outline = white border, primary = white fill */
+[data-theme="dark"] .navbar-btn--outline {
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  color: #fff !important;
+  background: transparent !important;
+}
+[data-theme="dark"] .navbar-btn--outline:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #fff !important;
+}
+[data-theme="dark"] .navbar-btn--primary {
+  border: 1px solid #fff !important;
+  color: #000 !important;
+  background: #fff !important;
+}
+[data-theme="dark"] .navbar-btn--primary:hover {
+  background: rgba(255, 255, 255, 0.9) !important;
+  color: #000 !important;
 }
 
 /* Playground */
