@@ -28,7 +28,7 @@ All packages are under the **@genetik** scope. The docs reference the ones curre
 | [@genetik/editor-react](./packages/editor) | React editor UI: palette, canvas, config panel. |
 | [@genetik/context-events](./packages/context-events) | Page context and context overrides for blocks. |
 
-See the [Packages](./packages) section for full reference.
+See the [Packages](./category/packages) section for full reference.
 
 ## Tutorial
 

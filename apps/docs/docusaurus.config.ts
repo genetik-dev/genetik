@@ -97,7 +97,7 @@ const config: Config = {
           title: "Docs",
           items: [
             { label: "Introduction", to: "/docs/intro" },
-            { label: "Packages", to: "/docs/packages" },
+            { label: "Packages", to: "/docs/category/packages" },
             {
               label: "Tutorial",
               to: "/docs/tutorial-basics/define-the-schema",
