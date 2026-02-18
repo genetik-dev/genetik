@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" aria-hidden="true">
+  <title>Genetik</title>
+  <line x1="10" y1="50" x2="50" y2="90" stroke-width="3" stroke-linecap="round"/>
+  <line x1="50" y1="90" x2="90" y2="50" stroke-width="3" stroke-linecap="round"/>
+  <line x1="50" y1="10" x2="10" y2="50" stroke-width="3" stroke-linecap="round"/>
+  <line x1="50" y1="50" x2="90" y2="50" stroke-width="3" stroke-linecap="round"/>
+
+  <circle cx="10" cy="50" r="7" fill="currentColor"/>
+  <circle cx="90" cy="50" r="7" fill="currentColor"/>
+  <circle cx="50" cy="10" r="7" fill="currentColor"/>
+  <circle cx="50" cy="50" r="7" fill="currentColor"/>
+  <circle cx="50" cy="90" r="7" fill="currentColor"/>
+</svg>

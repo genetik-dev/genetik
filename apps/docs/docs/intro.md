@@ -2,46 +2,34 @@
 sidebar_position: 1
 ---
 
-# Tutorial Intro
+# Introduction
 
-Let's discover **Docusaurus in less than 5 minutes**.
+**Genetik** is a JSON-driven UI ecosystem: schema-defined blocks, flat content trees, and a plugin-based renderer for CMS, LLM-driven UIs, and dynamic applications.
 
-## Getting Started
+## Core ideas
 
-Get started by **creating a new site**.
+- **JSON as source of truth** — UI structure and configuration live in data, not only in code.
+- **Schema-first** — A single schema defines what's allowed; it drives validation, tooling, and rendering.
+- **Flat content model** — Content is a flat map of nodes by id plus one entry id; slots reference children by id. Easy to patch, merge, and reason about.
+- **One content model, many consumers** — The same content can power editors, headless APIs, static site generation, and LLM-generated UIs.
 
-Or **try Docusaurus immediately** with **[docusaurus.new](https://docusaurus.new)**.
+## Packages
 
-### What you'll need
+All packages are under the **@genetik** scope. The docs reference the ones currently in this repo:
 
-- [Node.js](https://nodejs.org/en/download/) version 20.0 or above:
-  - When installing Node.js, you are recommended to check all checkboxes related to dependencies.
+| Package | Role |
+|--------|------|
+| [@genetik/schema](./packages/schema) | Block types, config schemas, slots. Build-time plugin API. |
+| [@genetik/content](./packages/content) | Flat content model, validation, normalization (inline → flat). |
+| [@genetik/patches](./packages/patches) | Structured mutations: add/remove/reorder nodes, update config. |
+| [@genetik/renderer](./packages/renderer) | Framework-agnostic core: content + schema + component map → UI. |
+| [@genetik/renderer-react](./packages/renderer-react) | React binding for the renderer. |
+| [@genetik/editor](./packages/editor) | Editor mutations and schema plugin. |
+| [@genetik/editor-react](./packages/editor) | React editor UI: palette, canvas, config panel. |
+| [@genetik/context-events](./packages/context-events) | Page context and context overrides for blocks. |
 
-## Generate a new site
+See the [Packages](./packages) section for full reference.
 
-Generate a new Docusaurus site using the **classic template**.
+## Tutorial
 
-The classic template will automatically be added to your project after you run the command:
-
-```bash
-npm init docusaurus@latest my-website classic
-```
-
-You can type this command into Command Prompt, Powershell, Terminal, or any other integrated terminal of your code editor.
-
-The command also installs all necessary dependencies you need to run Docusaurus.
-
-## Start your site
-
-Run the development server:
-
-```bash
-cd my-website
-npm run start
-```
-
-The `cd` command changes the directory you're working with. In order to work with your newly created Docusaurus site, you'll need to navigate the terminal there.
-
-The `npm run start` command builds your website locally and serves it through a development server, ready for you to view at http://localhost:3000/.
-
-Open `docs/intro.md` (this page) and edit some lines: the site **reloads automatically** and displays your changes.
+To build a small content editor (block palette, visual canvas, JSON mode, and preview) step by step, follow the **[Tutorial](./tutorial-basics/define-the-schema)**. You can try the result in the [Playground](/playground).

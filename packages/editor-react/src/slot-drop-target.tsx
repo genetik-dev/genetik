@@ -118,7 +118,7 @@ export function SlotDropTarget({
         layout === "row" && "flex flex-row flex-wrap items-stretch gap-2",
         layout === "column" && "flex flex-col gap-2",
         isOver && "border bg-(--editor-drop-bg,#eff6ff)",
-        !isOver && "border-[#ccc]",
+        !isOver && "border-[#ccc] dark:border-[var(--ifm-color-emphasis-300,#3a3a3a)]",
         isValidDropTarget && !isOver && "ring-2 ring-blue-400 ring-offset-1",
         className,
       )}
@@ -139,7 +139,7 @@ export function SlotDropTarget({
             <div className="flex items-stretch min-h-6">
               <Button
                 type="button"
-                className="h-full w-8 flex-shrink-0 flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-600 rounded border-0 p-0 text-lg font-normal"
+                className="h-full w-8 flex-shrink-0 flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-600 dark:bg-[#2a2a2a] dark:hover:bg-[#383838] dark:text-[#e5e5e5] rounded border-0 p-0 text-lg font-normal"
                 aria-label="Add block"
               >
                 +
@@ -148,7 +148,7 @@ export function SlotDropTarget({
           ) : (
             <Button
               type="button"
-              className="w-full flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-600 rounded border-0 py-2 text-lg font-normal"
+              className="w-full flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-600 dark:bg-[#2a2a2a] dark:hover:bg-[#383838] dark:text-[#e5e5e5] rounded border-0 py-2 text-lg font-normal"
               aria-label="Add block"
             >
               +
