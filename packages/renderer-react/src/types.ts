@@ -1,7 +1,6 @@
 import type { ComponentType, ReactNode } from "react";
 import type {
   PageContext,
-  PageEventCallback,
   PageEventPayload,
   PageRuntimeOptions,
 } from "@genetik/context-events";
