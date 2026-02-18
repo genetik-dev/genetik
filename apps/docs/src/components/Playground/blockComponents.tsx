@@ -1,4 +1,6 @@
 import type { BlockProps } from "@genetik/renderer-react";
+import { usePageRuntime } from "@genetik/renderer-react";
+import { getContextValue } from "@genetik/context-events";
 
 /** Page: root-only block; wraps the main content. */
 export function PageBlock({ slots }: BlockProps) {
@@ -69,5 +71,32 @@ export function ImageBlock({ config }: BlockProps) {
         </figcaption>
       ) : null}
     </figure>
+  );
+}
+
+/** Button: toggles a boolean in page context. Config.contextPath sets which key to toggle. */
+export function ButtonBlock({ config }: BlockProps) {
+  const runtime = usePageRuntime();
+  const { contextPath = "customContextBoolean", label = "Toggle" } = (config ?? {}) as {
+    contextPath?: string;
+    label?: string;
+  };
+  if (!runtime) {
+    return (
+      <span className="text-sm text-[var(--ifm-color-emphasis-500)]">
+        No context (button needs page runtime)
+      </span>
+    );
+  }
+  const value = getContextValue(runtime.context, contextPath) as boolean | undefined;
+  const next = !(value === true);
+  return (
+    <button
+      type="button"
+      className="px-3 py-1.5 text-sm rounded-lg border border-[var(--ifm-color-emphasis-300)] bg-[var(--ifm-color-emphasis-100)] hover:bg-[var(--ifm-color-emphasis-200)]"
+      onClick={() => runtime.updateContext(contextPath, next)}
+    >
+      {label}: {String(value ?? false)} → {String(next)}
+    </button>
   );
 }

@@ -75,6 +75,22 @@ export interface BaseConfigSchema {
 }
 
 /**
+ * Page context property: same shape as block config property (type, default).
+ * Editor plugins can extend with editorInput for the context editor UI.
+ */
+export type PageContextProperty = BaseConfigProperty;
+
+/**
+ * Schema for page context: top-level keys and their type/default (and optional editorInput).
+ * Registered via plugin (registerPageContextProperty) and/or passed in SchemaConfig.pageContextSchema.
+ */
+export interface PageContextSchema {
+  type?: "object";
+  properties?: Record<string, PageContextProperty>;
+  [key: string]: unknown;
+}
+
+/**
  * Block input when registering. Slots have no referenceMode (global on schema).
  * Optional properties like addable are added by plugins (e.g. editor plugin).
  */
@@ -85,6 +101,8 @@ export interface BlockInput {
   configSchema: BaseConfigSchema;
   /** Slots this block exposes. Default [] when omitted. */
   slots?: SlotInput[];
+  /** Optional: context keys (from page context schema) this block can listen to in overrides. */
+  availableContexts?: string[];
 }
 
 /**
@@ -99,6 +117,8 @@ export interface BlockTypeDefinition {
   slots: SlotDefinition[];
   /** When false, this block cannot be added from the palette or "+ Add block". Default true. */
   addable?: boolean;
+  /** Optional: context keys (from page context schema) this block can listen to in overrides. */
+  availableContexts?: string[];
 }
 
 /**
@@ -111,11 +131,13 @@ export interface SchemaOptions {
 }
 
 /**
- * Context passed to plugins. Plugins can register blocks and read/mutate options.
+ * Context passed to plugins. Plugins can register blocks, register page context properties, and read/mutate options.
  */
 export interface SchemaPluginContext {
   /** Register a block type. */
   registerBlock(block: BlockInput): void;
+  /** Register a page context property (key + type/default/editorInput). Merged with SchemaConfig.pageContextSchema. */
+  registerPageContextProperty(key: string, property: PageContextProperty): void;
   /** Resolved options (includes slotReferenceMode). Mutate to add plugin options. */
   options: SchemaOptions;
   /** Schema version if set. */
@@ -154,6 +176,8 @@ export interface SchemaConfig<
   version?: string;
   /** Schema options (e.g. slotReferenceMode). Merged with plugin-added options. */
   options?: SchemaOptions;
+  /** Optional page context schema (properties with type/default). Plugins can add via registerPageContextProperty. */
+  pageContextSchema?: PageContextSchema;
 }
 
 /**
@@ -172,4 +196,6 @@ export interface GenetikSchema {
   blockTypes: Map<string, BlockTypeDefinition>;
   /** Optional schema metadata (e.g. version). */
   meta?: SchemaMeta;
+  /** Resolved page context schema (from config + plugin registrations). Keys define available context for overrides. */
+  pageContextSchema?: PageContextSchema;
 }

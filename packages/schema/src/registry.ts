@@ -4,6 +4,8 @@ import type {
   BlockTypeDefinition,
   GenetikSchema,
   JsonSchema,
+  PageContextProperty,
+  PageContextSchema,
   SchemaOptions,
   SchemaPlugin,
   SlotDefinition,
@@ -50,6 +52,9 @@ function toBlockTypeDefinition(
     configSchema: block.configSchema,
     slots: (block.slots ?? []).map((s) => toSlotDefinition(s, referenceMode)),
     ...(block.addable === false && { addable: false }),
+    ...(block.availableContexts !== undefined && {
+      availableContexts: block.availableContexts,
+    }),
   };
 }
 
@@ -122,10 +127,16 @@ export function createSchema<P extends readonly import("./types.js").SchemaPlugi
 ): SchemaInstance {
   const blocks: BlockInput[] = [...(config.blocks ?? [])];
   const options = resolveOptions(config.options);
+  const pageContextProperties: Record<string, PageContextProperty> = {
+    ...(config.pageContextSchema?.properties ?? {}),
+  };
 
   const context: import("./types.js").SchemaPluginContext = {
     registerBlock(block: BlockInput) {
       blocks.push(block);
+    },
+    registerPageContextProperty(key: string, property: PageContextProperty) {
+      pageContextProperties[key] = property;
     },
     options,
     version: config.version,
@@ -134,6 +145,11 @@ export function createSchema<P extends readonly import("./types.js").SchemaPlugi
   for (const plugin of config.plugins ?? []) {
     plugin(context);
   }
+
+  const pageContextSchema: PageContextSchema | undefined =
+    Object.keys(pageContextProperties).length > 0
+      ? { type: "object", properties: pageContextProperties }
+      : undefined;
 
   const referenceMode = (options.slotReferenceMode ?? DEFAULT_REFERENCE_MODE) as SlotReferenceMode;
   const blockTypes = new Map<string, BlockTypeDefinition>();
@@ -147,6 +163,7 @@ export function createSchema<P extends readonly import("./types.js").SchemaPlugi
   const schema: GenetikSchema = {
     blockTypes,
     meta: config.version !== undefined ? { version: config.version } : undefined,
+    ...(pageContextSchema && { pageContextSchema }),
   };
 
   return {
@@ -185,4 +202,17 @@ export function hasBlockType(schema: GenetikSchema, id: string): boolean {
  */
 export function getBlockTypeNames(schema: GenetikSchema): string[] {
   return Array.from(schema.blockTypes.keys());
+}
+
+/**
+ * Schema plugin that registers a page context schema. Pass the result to createSchema plugins.
+ * Usage: registerPlugins([editorSchemaPlugin, contextPlugin(contextSchema)] as const)
+ */
+export function contextPlugin(pageContextSchema: PageContextSchema): SchemaPlugin {
+  return (context) => {
+    const properties = pageContextSchema.properties ?? {};
+    for (const [key, property] of Object.entries(properties)) {
+      context.registerPageContextProperty(key, property);
+    }
+  };
 }

@@ -1,7 +1,32 @@
-import { createSchema, registerPlugins } from "@genetik/schema";
+import { createSchema, registerPlugins, contextPlugin } from "@genetik/schema";
 import { editorSchemaPlugin } from "@genetik/editor";
 
-const { plugins, defineBlock } = registerPlugins([editorSchemaPlugin] as const);
+/** Page context schema: keys with type/default/editorInput. Blocks declare availableContexts to listen to these. */
+const contextSchema = {
+  type: "object" as const,
+  properties: {
+    customContextBoolean: {
+      type: "boolean" as const,
+      default: false,
+      editorInput: "checkbox" as const,
+    },
+    theme: {
+      type: "string" as const,
+      default: "light",
+      editorInput: "text" as const,
+    },
+    role: {
+      type: "string" as const,
+      default: "viewer",
+      editorInput: "text" as const,
+    },
+  },
+};
+
+const { plugins, defineBlock } = registerPlugins([
+  editorSchemaPlugin,
+  contextPlugin(contextSchema),
+] as const);
 
 const textBlock = defineBlock({
   id: "text",
@@ -17,6 +42,7 @@ const textBlock = defineBlock({
     },
   },
   slots: [],
+  availableContexts: ["theme", "role", "customContextBoolean"],
 });
 
 const cardBlock = defineBlock({
@@ -38,6 +64,7 @@ const cardBlock = defineBlock({
       excludeBlockNames: ["card", "column"],
     },
   ],
+  availableContexts: ["theme", "role", "customContextBoolean"],
 });
 
 const rowBlock = defineBlock({
@@ -99,6 +126,28 @@ const imageBlock = defineBlock({
   },
 });
 
+/** Button: toggles a boolean in page context. Config sets which context key to toggle. */
+const buttonBlock = defineBlock({
+  id: "button",
+  configSchema: {
+    type: "object",
+    properties: {
+      contextPath: {
+        type: "string",
+        default: "customContextBoolean",
+        editorInput: "text",
+      },
+      label: {
+        type: "string",
+        default: "Toggle",
+        editorInput: "text",
+      },
+    },
+  },
+  slots: [],
+  availableContexts: ["customContextBoolean"],
+});
+
 /** Root-only block: not addable from palette or "+ Add block". Only rows as direct children. */
 const pageBlock = defineBlock({
   id: "page",
@@ -108,6 +157,14 @@ const pageBlock = defineBlock({
 });
 
 export const playgroundSchema = createSchema({
-  blocks: [textBlock, cardBlock, rowBlock, columnBlock, imageBlock, pageBlock],
+  blocks: [
+    textBlock,
+    cardBlock,
+    rowBlock,
+    columnBlock,
+    imageBlock,
+    buttonBlock,
+    pageBlock,
+  ],
   plugins,
 });

@@ -1,6 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { applyContextOverrides } from "@genetik/context-events";
 import { Button } from "@genetik/ui-react";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, EyeOff } from "lucide-react";
+import { usePageRuntime } from "@genetik/renderer-react";
 import { useEditor } from "./use-editor";
 import { EditorBlockContent } from "./editor-block-content";
 
@@ -14,12 +16,22 @@ export function BlockSurface({
   nodeId,
   onEditClick,
 }: BlockSurfaceProps): React.ReactElement | null {
-  const { content, dispatch } = useEditor();
+  const { content, context: editorContext, dispatch } = useEditor();
+  const runtime = usePageRuntime();
   const node = content.nodes[nodeId];
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const [isHovered, setIsHovered] = useState(false);
   const [isSelected, setIsSelected] = useState(false);
   const showActions = isHovered || isSelected;
+
+  const visible = useMemo(() => {
+    if (!node || editorContext === undefined || !runtime) return true;
+    const { visible: v } = applyContextOverrides(
+      node.config as Record<string, unknown>,
+      runtime.context
+    );
+    return v;
+  }, [node, editorContext, runtime]);
 
   /** True when the target is directly in this block (not inside a child block). */
   const isDirectTarget = useCallback(
@@ -67,14 +79,23 @@ export function BlockSurface({
           onEditClick={onEditClick}
         />
       )}
+      renderWhenHidden={true}
     />
   );
+
+  const wrappedContent =
+    visible ? contentNode : (
+      <div className="opacity-50" aria-hidden="true">
+        {contentNode}
+      </div>
+    );
 
   return (
     <div
       ref={wrapperRef}
       data-block={node.block}
       data-node-id={nodeId}
+      data-visible={visible ? "true" : "false"}
       className="relative group"
       onMouseEnter={handleMouseEnter}
       onMouseMove={handleMouseMove}
@@ -82,7 +103,16 @@ export function BlockSurface({
       onClick={handleClick}
     >
       {showActions && (
-        <div className="absolute top-0 right-0 z-10 flex gap-0.5">
+        <div className="absolute top-0 right-0 z-10 flex gap-0.5 items-center">
+          {!visible && (
+            <span
+              className="text-muted-foreground flex items-center"
+              title="Hidden by context"
+              aria-label="Hidden by context"
+            >
+              <EyeOff className="size-3.5" />
+            </span>
+          )}
           {onEditClick && (
             <Button
               type="button"
@@ -113,7 +143,7 @@ export function BlockSurface({
           </Button>
         </div>
       )}
-      {contentNode}
+      {wrappedContent}
     </div>
   );
 }

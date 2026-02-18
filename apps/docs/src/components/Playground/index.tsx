@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback, useRef } from "react";
 import { renderContent } from "@genetik/renderer-react";
 import { parseContentJson } from "@genetik/content";
 import type { GenetikContent } from "@genetik/content";
@@ -16,8 +16,10 @@ import {
   RowBlock,
   ColumnBlock,
   ImageBlock,
+  ButtonBlock,
 } from "./blockComponents";
 import type { ComponentMap } from "@genetik/renderer-react";
+import { setContextValue, type PageContext } from "@genetik/context-events";
 
 const INITIAL_CONTENT: GenetikContent = {
   entryId: "root",
@@ -38,14 +40,28 @@ const INITIAL_CONTENT: GenetikContent = {
       id: "mainCol",
       block: "column",
       config: {},
-      children: ["intro", "hint", "sectionRow", "img1"],
+      children: ["intro", "hint", "toggleRow", "sectionRow", "img1"],
     },
     intro: {
       id: "intro",
       block: "text",
       config: {
         content:
-          "Edit the JSON or use the visual editor. Try: text, card, row, column, image.",
+          "Edit the JSON or use the visual editor. Try: text, card, row, column, image, button.",
+      },
+    },
+    toggleRow: {
+      id: "toggleRow",
+      block: "row",
+      config: { gap: "normal" },
+      children: ["toggleBtn"],
+    },
+    toggleBtn: {
+      id: "toggleBtn",
+      block: "button",
+      config: {
+        contextPath: "customContextBoolean",
+        label: "Toggle customContextBoolean",
       },
     },
     hint: {
@@ -103,6 +119,7 @@ const componentMap: ComponentMap = {
   row: RowBlock,
   column: ColumnBlock,
   image: ImageBlock,
+  button: ButtonBlock,
 };
 
 type PlaygroundMode = "json" | "visual";
@@ -116,9 +133,26 @@ export default function Playground() {
 
   const parseResult = useMemo(() => parseContentJson(raw), [raw]);
 
+  const [pageContext, setPageContext] = useState<PageContext>(() => ({
+    customContextBoolean: true,
+  }));
+
+  const twpRef = useRef<HTMLDivElement>(null);
+
+  const handleContextUpdate = useCallback((path: string, value: unknown) => {
+    setPageContext((prev) => {
+      const next = JSON.parse(JSON.stringify(prev)) as PageContext;
+      setContextValue(next, path, value);
+      return next;
+    });
+  }, []);
+
   const preview = useMemo(() => {
-    return renderContent(content, playgroundSchema, componentMap);
-  }, [content]);
+    return renderContent(content, playgroundSchema, componentMap, {
+      context: pageContext,
+      onContextUpdate: handleContextUpdate,
+    });
+  }, [content, pageContext, handleContextUpdate]);
 
   const handleJsonChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -186,12 +220,15 @@ export default function Playground() {
       )}
 
       {mode === "visual" && (
-        <div data-twp>
+        <div data-twp ref={twpRef}>
           <EditorProvider
             schema={playgroundSchema}
             content={content}
             onChange={handleVisualContentChange}
             componentMap={componentMap}
+            context={pageContext}
+            onContextUpdate={handleContextUpdate}
+            portalContainer={twpRef}
           >
             <EditorDndProvider>
               <div style={{ display: "flex", gap: 24, marginBottom: 24 }}>

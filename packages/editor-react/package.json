@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@atlaskit/pragmatic-drag-and-drop": "^1.7.0",
+    "@genetik/context-events": "workspace:*",
     "@genetik/content": "workspace:*",
     "@genetik/editor": "workspace:*",
     "@genetik/patches": "workspace:*",
