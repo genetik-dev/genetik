@@ -1,5 +1,11 @@
 # @genetik/schema
 
+## 0.0.3
+
+### Patch Changes
+
+- b861410: add basic working context
+
 ## 0.0.2
 
 ### Patch Changes

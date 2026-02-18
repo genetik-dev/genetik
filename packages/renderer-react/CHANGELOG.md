@@ -1,5 +1,16 @@
 # @genetik/renderer-react
 
+## 0.0.3
+
+### Patch Changes
+
+- b861410: add basic working context
+- Updated dependencies [b861410]
+  - @genetik/context-events@0.0.2
+  - @genetik/schema@0.0.3
+  - @genetik/content@0.0.3
+  - @genetik/renderer@0.0.3
+
 ## 0.0.2
 
 ### Patch Changes

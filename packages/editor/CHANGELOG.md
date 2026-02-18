@@ -1,5 +1,14 @@
 # @genetik/editor
 
+## 0.0.2
+
+### Patch Changes
+
+- Updated dependencies [b861410]
+  - @genetik/schema@0.0.3
+  - @genetik/content@0.0.3
+  - @genetik/patches@0.0.3
+
 ## 0.0.1
 
 ### Patch Changes
